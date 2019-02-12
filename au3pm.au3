@@ -5,6 +5,8 @@
 #AutoIt3Wrapper_Change2CUI=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
+#include <WinAPIFiles.au3>
+#include <File.au3>
 #include <Array.au3>
 
 ;FIXME: support au3pm-lock.yaml
@@ -36,6 +38,8 @@ Global $commands = [ _
 
 Global $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
 $command = StringLower($command)
+
+$hDLL_7ZIP = DllOpen(@ScriptDir & '\7za.dll')
 
 Switch ($command)
     Case 'bin'
@@ -72,10 +76,47 @@ Switch ($command)
                 ConsoleWriteLine('no dependencies found in au3pm.yaml')
                 Exit
             EndIf
+
+            ConsoleWriteLine('Clearing dependency folder'&@CRLF)
+            DirRemove(@WorkingDir & '\au3pm\')
+            DirCreate(@WorkingDir & '\au3pm\')
+
+            HttpSetUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0')
+            $tmp = @TempDir & '\' & StringFormat('au3pm %s-%s-%s %s-%s-%s %s', @MDAY, @MON, @YEAR, @HOUR, @MIN, @SEC, @MSEC); & '\'
+            DirCreate($tmp)
             For $i = 0 To UBound($yaml)-1 Step +2
-                ConsoleWriteLine($yaml[$i])
-                ConsoleWriteLine(@TAB&$yaml[$i+1])
+                If StringRegExp($yaml[$i+1], '^([^/]+/.*)(?:#(.*))$') Then
+                    $url = StringRegExp($yaml[$i+1], '^([^/]+/.*?)(?:#(.*))?$', 1)
+                    ConsoleWriteLine('Github detected.')
+                    $url = StringFormat("https://github.com/%s/archive/%s.zip", $url[0], execute('$url[1]') ? $url[1] : 'master')
+                ElseIf StringRegExp($yaml[$i+1], '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$') Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
+                    ConsoleWriteLine('Semver detected. au3pm repository lookup...')
+                Else
+                    ConsoleWriteLine(StringFormat('Specification in %s is invalid and/or not supported', $yaml[$i]))
+                    ConsoleWriteLine('Exitting...')
+                    Exit
+                EndIf
+
+                ConsoleWriteLine('Downloading ' & $yaml[$i])
+                ConsoleWriteLine()
+                $tmp_file = _TempFile($tmp, '~')
+
+                InetGet($url, $tmp_file, 16, 0)
+                If @error <> 0 Then
+                    ConsoleWriteLine('Failure downloading. Exitting...')
+                    Exit
+                EndIf
+                ConsoleWriteLine('Extracting...')
+                If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
+                    ConsoleWriteLine('Failure extracting. Exitting...')
+                    Exit
+                EndIf
+                If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$yaml[$i]&'\') <> 1 Then
+                    ConsoleWriteLine('Failure moving extracted content to au3pm folder. Exitting...')
+                    Exit
+                EndIf
             Next
+            DirRemove($tmp, 1)
         Else
             ;folder - symlink in current project
             ;tarball file - 
@@ -107,7 +148,7 @@ Switch ($command)
         ConsoleWriteLine(@CRLF&"Did you mean: "&$match)
 EndSwitch
 
-Func ConsoleWriteLine($data)
+Func ConsoleWriteLine($data='')
     ConsoleWrite($data&@CRLF)
 EndFunc
 
