@@ -36,6 +36,10 @@ Global $commands = [ _
     'version' _
 ]
 
+ConsoleWriteLine('AutoIt package manager by genius257. Prebuild.')
+ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work or be completed.')
+ConsoleWriteLine()
+
 Global $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
 $command = StringLower($command)
 
