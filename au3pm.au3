@@ -39,8 +39,6 @@ Global $commands = [ _
 Global $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
 $command = StringLower($command)
 
-$hDLL_7ZIP = DllOpen(@ScriptDir & '\7za.dll')
-
 Switch ($command)
     Case 'bin'
     Case 'bugs'
