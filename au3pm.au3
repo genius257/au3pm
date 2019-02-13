@@ -70,22 +70,22 @@ Switch ($command)
         If $CmdLine[0] = 1 Then
             If Not FileExists(@WorkingDir & '\au3pm.yaml') Then
                 ConsoleWriteLine('au3pm.yaml not found.')
-                Exit
+                Exit 0
             EndIf
             $yaml = FileRead(@WorkingDir & '\au3pm.yaml')
             If @error <> 0 Then
                 ConsoleWriteLine('problem occured when reading au3pm.yaml')
-                Exit
+                Exit 1
             EndIf
             $yaml = StringRegExp($yaml, "(?im)^dependencies: ?$(?:\R^(([ ]+)[^:]+: .*$(:?\R^\2[^:\h]+: .+$)*))?", 1)
             If @error <> 0 Then
                 ConsoleWriteLine('no dependencies found in au3pm.yaml')
-                Exit
+                Exit 0
             EndIf
             $yaml = StringRegExp($yaml[0], "(?m)^[ ]+([^:\h]+): (.+)$", 3)
             If @error <> 0 Then
                 ConsoleWriteLine('no dependencies found in au3pm.yaml')
-                Exit
+                Exit 0
             EndIf
 
             ConsoleWriteLine('Clearing dependency folder'&@CRLF)
@@ -105,7 +105,7 @@ Switch ($command)
                 Else
                     ConsoleWriteLine(StringFormat('Specification in %s is invalid and/or not supported', $yaml[$i]))
                     ConsoleWriteLine('Exitting...')
-                    Exit
+                    Exit 1
                 EndIf
 
                 ConsoleWriteLine('Downloading ' & $yaml[$i])
@@ -115,16 +115,16 @@ Switch ($command)
                 InetGet($url, $tmp_file, 16, 0)
                 If @error <> 0 Then
                     ConsoleWriteLine('Failure downloading. Exitting...')
-                    Exit
+                    Exit 1
                 EndIf
                 ConsoleWriteLine('Extracting...')
                 If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
                     ConsoleWriteLine('Failure extracting. Exitting...')
-                    Exit
+                    Exit 1
                 EndIf
                 If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$yaml[$i]&'\') <> 1 Then
                     ConsoleWriteLine('Failure moving extracted content to au3pm folder. Exitting...')
-                    Exit
+                    Exit 1
                 EndIf
             Next
             DirRemove($tmp, 1)
