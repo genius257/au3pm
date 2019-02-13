@@ -48,7 +48,7 @@ Switch ($command)
     Case 'config'
         ;one of many sub commands under config, needed to verify if the system is working
         $include = RegRead('HKEY_CURRENT_USER\Software\AutoIt v3\AutoIt', "Include");It should be a REG_SZ (string) value
-        If @error <> 0 Then ConsoleWrite('WARNING: failed to read registry value at "HKEY_CURRENT_USER\Software\AutoIt v3\AutoIt" called "Include"')
+        If @error <> 0 Then ConsoleWriteLine('WARNING: failed to read registry value at "HKEY_CURRENT_USER\Software\AutoIt v3\AutoIt" called "Include"')
         $includes = StringSplit($include, ';', 2)
         $bFound = False
         For $include In $includes
