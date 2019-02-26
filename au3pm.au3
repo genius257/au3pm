@@ -9,6 +9,9 @@
 #include <File.au3>
 #include <Array.au3>
 
+#include "au3pm\au3json\json.au3"
+#include "au3pm\semver\SemVer.au3"
+
 ;FIXME: support au3pm-lock.yaml
 
 Global $commands = [ _
@@ -37,7 +40,7 @@ Global $commands = [ _
 ]
 
 ConsoleWriteLine('AutoIt package manager by genius257. Prebuild.')
-ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work or be completed.')
+ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work or be completed at this stage.')
 ConsoleWriteLine()
 
 Global $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
@@ -68,25 +71,36 @@ Switch ($command)
         ConsoleWriteLine('Where (command) is one of: ')
         ConsoleWriteLine(@TAB & _ArrayToString($commands, ', '))
     Case 'init'
+        $hFile = _WinAPI_CreateFile('CON', 2, 2)
+        $input = ""
+        $tBuffer = DllStructCreate('char')
+        $nRead = 0
+        ConsoleWrite("input: ")
+        While 1
+            _WinAPI_ReadFile($hFile, DllStructGetPtr($tBuffer), 1, $nRead)
+            If DllStructGetData($tBuffer, 1) = @CR Then ExitLoop
+            If $nRead > 0 Then $input &= DllStructGetData($tBuffer, 1)
+        WEnd
+        FileClose($hFile)
+        ConsoleWrite("Input was: " & '"' & $input & '"' & @CRLF)
+        Exit 0
     Case 'install'
         If $CmdLine[0] = 1 Then
-            If Not FileExists(@WorkingDir & '\au3pm.yaml') Then
-                ConsoleWriteLine('au3pm.yaml not found.')
+            If Not FileExists(@WorkingDir & '\au3pm.json') Then
+                ConsoleWriteLine('au3pm.json not found.')
                 Exit 0
             EndIf
-            $yaml = FileRead(@WorkingDir & '\au3pm.yaml')
+
+            $json = FileRead(@WorkingDir & '\au3pm.json')
+            $json = json_parse(json_lex($json))[0]
             If @error <> 0 Then
-                ConsoleWriteLine('problem occured when reading au3pm.yaml')
+                ConsoleWriteLine('problem occured when reading au3pm.json')
                 Exit 1
             EndIf
-            $yaml = StringRegExp($yaml, "(?im)^dependencies: ?$(?:\R^(([ ]+)[^:]+: .*$(:?\R^\2[^:\h]+: .+$)*))?", 1)
+
+            $dependencies = $json.Item('dependencies')
             If @error <> 0 Then
-                ConsoleWriteLine('no dependencies found in au3pm.yaml')
-                Exit 0
-            EndIf
-            $yaml = StringRegExp($yaml[0], "(?m)^[ ]+([^:\h]+): (.+)$", 3)
-            If @error <> 0 Then
-                ConsoleWriteLine('no dependencies found in au3pm.yaml')
+                ConsoleWriteLine('no dependencies found in au3pm.json')
                 Exit 0
             EndIf
 
@@ -97,20 +111,26 @@ Switch ($command)
             HttpSetUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0')
             $tmp = @TempDir & '\' & StringFormat('au3pm %s-%s-%s %s-%s-%s %s', @MDAY, @MON, @YEAR, @HOUR, @MIN, @SEC, @MSEC); & '\'
             DirCreate($tmp)
-            For $i = 0 To UBound($yaml)-1 Step +2
-                If StringRegExp($yaml[$i+1], '^([^/]+/.*)(?:#(.*))$') Then
-                    $url = StringRegExp($yaml[$i+1], '^([^/]+/.*?)(?:#(.*))?$', 1)
+
+            For $dependency In $dependencies
+                ConsoleWrite($dependency&@CRLF)
+                $info = $dependencies.Item($dependency)
+                If StringRegExp($info, '^([^/]+/.*)(?:#(.*))$') Then
+                    $url = StringRegExp($info, '^([^/]+/.*?)(?:#(.*))?$', 1)
                     ConsoleWriteLine('Github detected.')
                     $url = StringFormat("https://github.com/%s/archive/%s.zip", $url[0], execute('$url[1]') ? $url[1] : 'master')
-                ElseIf StringRegExp($yaml[$i+1], '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$') Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
+                ;FIXME: support ranges like: 1.0.0 - 2.0.0
+                ElseIf IsArray(__SemVer_ConditionParse($info)) Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
                     ConsoleWriteLine('Semver detected. au3pm repository lookup...')
+                    ;TODO
+                    ContinueLoop
                 Else
-                    ConsoleWriteLine(StringFormat('Specification in %s is invalid and/or not supported', $yaml[$i]))
+                    ConsoleWriteLine(StringFormat('Specification in %s is invalid and/or not supported', $dependency))
                     ConsoleWriteLine('Exitting...')
                     Exit 1
                 EndIf
 
-                ConsoleWriteLine('Downloading ' & $yaml[$i])
+                ConsoleWriteLine('Downloading ' & $info)
                 ConsoleWriteLine()
                 $tmp_file = _TempFile($tmp, '~')
 
@@ -119,16 +139,19 @@ Switch ($command)
                     ConsoleWriteLine('Failure downloading. Exitting...')
                     Exit 1
                 EndIf
+
                 ConsoleWriteLine('Extracting...')
+
                 If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
                     ConsoleWriteLine('Failure extracting. Exitting...')
                     Exit 1
                 EndIf
-                If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$yaml[$i]&'\') <> 1 Then
+                If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$dependency&'\') <> 1 Then
                     ConsoleWriteLine('Failure moving extracted content to au3pm folder. Exitting...')
                     Exit 1
                 EndIf
             Next
+
             DirRemove($tmp, 1)
         Else
             ;folder - symlink in current project
