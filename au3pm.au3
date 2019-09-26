@@ -39,7 +39,7 @@ Global $commands = [ _
     'version' _
 ]
 
-ConsoleWriteLine('AutoIt package manager by genius257. Prebuild.')
+ConsoleWriteLine('AutoIt3 package manager by genius257. Prebuild.')
 ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work or be completed at this stage.')
 ConsoleWriteLine()
 
