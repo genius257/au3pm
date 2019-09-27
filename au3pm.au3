@@ -12,7 +12,7 @@
 #include "au3pm\au3json\json.au3"
 #include "au3pm\semver\SemVer.au3"
 
-;FIXME: support au3pm-lock.yaml
+;FIXME: support au3pm-lock.json
 
 Global $commands = [ _
     'bin', _
