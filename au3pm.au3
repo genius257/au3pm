@@ -1,6 +1,6 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=bin\au3pm.exe
-#AutoIt3Wrapper_Outfile_x64=bin\au3pm_x64.exe
+#AutoIt3Wrapper_Outfile=build\au3pm.exe
+#AutoIt3Wrapper_Outfile_x64=build\au3pm_x64.exe
 #AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Change2CUI=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
@@ -8,11 +8,14 @@
 #include <WinAPIFiles.au3>
 #include <File.au3>
 #include <Array.au3>
+#include <InetConstants.au3>
 
 #include "au3pm\au3json\json.au3"
 #include "au3pm\semver\SemVer.au3"
 
 ;FIXME: support au3pm-lock.json
+
+Global Const $registry = "https://raw.githubusercontent.com/au3pm/action-test/master/"
 
 Global $commands = [ _
     'bin', _
@@ -129,4 +132,45 @@ Func levenshtein($a, $b); source: https://www.autoitscript.com/forum/topic/17988
     Next
 
     Return $d[StringLen($a)][StringLen($b)]
+EndFunc
+
+Func fetchPackage($name, $reference)
+    ; In a pure JS fashion, if it looks like a path, it must be a path.
+    If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference)
+
+    If __SemVer_ConditionParse($reference) Or @error=0 Then; _SemVer_Valid($reference) Then
+        Local $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
+        Local $pathName = $directory.Item($name)
+        Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $name, "au3pm.json"), $INET_FORCEBYPASS))))[0]
+        Local $versions = $packageDirectory.Item('versions').keys()
+        Local $maxSatisfying = _semver_MaxSatisfying($versions, $reference)
+        Local $sha = $packageDirectory.Item('versions').Item($maxSatisfying)
+        Local $repo = $packageDirectory.Item('repo')
+        Return fetchPackage($name, StringFormat('https://github.com/%s/archive/%s.zip', $repo, $sha))
+    EndIf
+
+    Return $reference
+    Local $response = BinaryToString(InetRead($reference, 16))
+    If @error<> 0 Then ConsoleWrite(StringFormat('Couldn''''t fetch package "%s"\n', $response))
+
+    Return $response
+EndFunc
+
+Func _SemVer_MaxSatisfying($versions, $range)
+    Local $i
+    Local $max
+
+    For $i = 0 To UBound($versions)-1
+        If (Not $max) Or _SemVer_Compare($max, $versions[$i]) = -1 Then $max = $versions[$i]
+    Next
+
+    Return $max
+EndFunc
+
+Func getPackageDependencyTree($name, $reference, $dependencies, $available = ObjCreate("Scripting.Dictionary"))
+    $dependencies.clone()
+EndFunc
+
+Func getPackageDependencies()
+    ;
 EndFunc

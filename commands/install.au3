@@ -32,11 +32,9 @@ If $CmdLine[0] = 1 Then
             $url = StringRegExp($info, '^([^/]+/.*?)(?:#(.*))?$', 1)
             ConsoleWriteLine('Github detected.')
             $url = StringFormat("https://github.com/%s/archive/%s.zip", $url[0], execute('$url[1]') ? $url[1] : 'master')
-        ;FIXME: support ranges like: 1.0.0 - 2.0.0
         ElseIf IsArray(__SemVer_ConditionParse($info)) Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
             ConsoleWriteLine('Semver detected. au3pm repository lookup...')
-            ;TODO
-            ContinueLoop
+            $url = fetchPackage($dependency, $info)
         Else
             ConsoleWriteLine(StringFormat('Specification in %s is invalid and/or not supported', $dependency))
             ConsoleWriteLine('Exitting...')
