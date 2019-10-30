@@ -135,11 +135,12 @@ Func levenshtein($a, $b); source: https://www.autoitscript.com/forum/topic/17988
 EndFunc
 
 Func fetchPackage($name, $reference)
+    ;FIXME: if $name = "autoit", resolve reference with AutoIt's weird versioning and inject a au3pm.json into the extracted archive, for add symlink to bin folder and such.
     ; In a pure JS fashion, if it looks like a path, it must be a path.
     If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference)
 
     If __SemVer_ConditionParse($reference) Or @error=0 Then; _SemVer_Valid($reference) Then
-        Local $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
+        Local Static $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
         Local $pathName = $directory.Item($name)
         Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $name, "au3pm.json"), $INET_FORCEBYPASS))))[0]
         Local $versions = $packageDirectory.Item('versions').keys()
