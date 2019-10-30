@@ -168,8 +168,46 @@ Func _SemVer_MaxSatisfying($versions, $range)
     Return $max
 EndFunc
 
-Func getPackageDependencyTree($name, $reference, $dependencies, $available = ObjCreate("Scripting.Dictionary"))
-    $dependencies.clone()
+Func getPackageDependencyTree($dependencies)
+    Local Static $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
+    Local $resolvedDependencies = ObjCreate("Scripting.Dictionary")
+    Local $queue = ObjCreate("System.Collections.ArrayList")
+    $queue.Add($dependencies)
+    ;Local $cache = ObjCreate("Scripting.Dictionary")
+
+    While 1
+        If $queue.Count() <= 0 Then ExitLoop
+        Local $entry = $queue.Item(0)
+        $queue.RemoveAt(0)
+        Local $keys = Array_AsList($entry.Keys())
+        While 1
+            If $keys.Count() <= 0 Then ExitLoop
+            Local $keyEntry = $keys.Item(0)
+            $keys.RemoveAt(0)
+            ConsoleWrite($keyEntry&@CRLF)
+            Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $keyEntry, "au3pm.json"), $INET_FORCEBYPASS))))[0]
+            Local $range = $entry.Item($keyEntry)
+            Local $versions = $packageDirectory.Item('versions')
+            Local $maxSatisfying = _SemVer_MaxSatisfying($versions, $range)
+            Local $__ref = $resolvedDependencies.Keys()
+            If _ArraySearch($__ref, $keyEntry) > -1 Then ;Not $resolvedDependencies.__get($keyEntry) = "" Then
+                ;TODO: we need atleast the previous range to find a commen acceptable range (i would imagine all the ranges are needed)
+                If Not _SemVer_Satisfies($resolvedDependencies.__get($keyEntry), $range) Then Exit MsgBox(0, "", "dependency version conflict")
+                ContinueLoop
+                ;solve diff, if possible or throw "exception"
+            EndIf
+            $resolvedDependencies.Add($keyEntry, $maxSatisfying)
+
+            ;pretend we get package file from package with the version we matched
+            Local $__ref = $directory.Keys()
+            If _ArraySearch($__ref, $keyEntry) = -1 Then Exit MsgBox(0, "", "no match")
+            Local $package = ObjCreate("Scripting.Dictionary"); FIXME: get au3json file from package repo
+                $package.Add('dependencies', ObjCreate("Scripting.Dictionary")) ;NOTE: quickfix for not getting the au3json from the package repo
+            $queue.Add($package.Item('dependencies'))
+        WEnd
+    WEnd
+
+    return $resolvedDependencies
 EndFunc
 
 Func getPackageDependencies()
