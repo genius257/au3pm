@@ -21,7 +21,6 @@ If $CmdLine[0] = 1 Then
     DirRemove(@WorkingDir & '\au3pm\', 1)
     DirCreate(@WorkingDir & '\au3pm\')
 
-    HttpSetUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0')
     $tmp = @TempDir & '\' & StringFormat('au3pm %s-%s-%s %s-%s-%s %s', @MDAY, @MON, @YEAR, @HOUR, @MIN, @SEC, @MSEC); & '\'
     DirCreate($tmp)
 

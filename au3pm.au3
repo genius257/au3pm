@@ -38,6 +38,8 @@ Global $commands = [ _
     'version' _
 ]
 
+HttpSetUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0')
+
 ConsoleWriteLine('AutoIt3 package manager by genius257. Prebuild.')
 ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work or be completed at this stage.')
 ConsoleWriteLine()
