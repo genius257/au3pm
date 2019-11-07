@@ -177,7 +177,7 @@ Func getPackageDependencyTree($dependencies)
         If $queue.Count() <= 0 Then ExitLoop
         Local $entry = $queue.Item(0)
         $queue.RemoveAt(0)
-        Local $keys = Array_AsList($entry.Keys())
+        Local $keys = $entry.Keys(); FIXME: Array_AsList($entry.Keys())
         While 1
             If $keys.Count() <= 0 Then ExitLoop
             Local $keyEntry = $keys.Item(0)
