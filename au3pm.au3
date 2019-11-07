@@ -222,3 +222,17 @@ EndFunc
 Func fetchAutoIt($reference)
     ;get autoit versions (release and beta), resolve reference, download and extract autoit, inject special au3pm.json file into extracted content, return path to folder?
 EndFunc
+
+Func ConsoleReadLineSync()
+    Local $hFile = _WinAPI_CreateFile('CON', 2, 2)
+    Local $input = ""
+    Local $tBuffer = DllStructCreate('char')
+    Local $nRead = 0
+    While 1
+        _WinAPI_ReadFile($hFile, DllStructGetPtr($tBuffer), 1, $nRead)
+        If DllStructGetData($tBuffer, 1) = @CR Then ExitLoop
+        If $nRead > 0 Then $input &= DllStructGetData($tBuffer, 1)
+    WEnd
+    FileClose($hFile)
+    Return $input
+EndFunc
