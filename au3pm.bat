@@ -10,10 +10,10 @@ IF BitVersion == 32 (set AutoItReg="HKEY_LOCAL_MACHINE\Software\AutoIt v3") ELSE
 
 FOR /F "skip=2 tokens=2,*" %%A IN ('reg query "%AutoItReg:"=%\AutoIt" /v "InstallDir"') DO set "AutoItDir=%%B"
 
-IF EXIST ".\build\au3pm.exe" (DEL ".\build\au3pm.exe")
+IF EXIST "%~dp0\build\au3pm.exe" (DEL "%~dp0\build\au3pm.exe")
 
-"%AutoItDir%\Aut2Exe\Aut2exe.exe" /in "au3pm.au3" /out ".\build\au3pm.exe" /x86 /console
+"%AutoItDir%\Aut2Exe\Aut2exe.exe" /in "%~dp0\au3pm.au3" /out "%~dp0\build\au3pm.exe" /x86 /console
 
-CD ".\build\"
+CD "%~dp0\build\"
 
 "au3pm.exe" %*
