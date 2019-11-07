@@ -5,6 +5,7 @@
 #AutoIt3Wrapper_Change2CUI=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
+#include <WinAPIProc.au3>
 #include <WinAPIFiles.au3>
 #include <File.au3>
 #include <Array.au3>
