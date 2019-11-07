@@ -22,15 +22,11 @@ Global $commands = [ _
     'bugs', _
     'build', _
     'config', _
-    'depricate', _
-    'edit', _
-    'get', _
     'explore', _
     'help', _
     'init', _
     'install', _
     'list', _
-    'owner', _
     'pack', _
     'rebuild', _
     'restart', _
@@ -50,15 +46,13 @@ Global $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
 $command = StringLower($command)
 
 Switch ($command)
-    Case 'bin'
-    Case 'bugs'
-    Case 'build'
+    Case 'bin' ;FIXME: review
+    Case 'bugs' ;FIXME: review
+    Case 'build' ;FIXME: implement
+        #include "./commands/build.au3"
     Case 'config'
         #include "./commands/config.au3"
-    Case 'depricate'
-    Case 'edit'
-    Case 'get'
-    Case 'explore'
+    Case 'explore' ;FIXME: review
     Case 'help', ''
         ConsoleWriteLine('usage: au3pm (command)'&@CRLF)
         ConsoleWriteLine('Where (command) is one of: ')
@@ -67,16 +61,18 @@ Switch ($command)
         #include "./commands/init.au3"
     Case 'install'
         #include "./commands/install.au3"
-    Case 'list'
-    Case 'owner'
-    Case 'pack'
-    Case 'rebuild'
-    Case 'restart'
-    Case 'start'
-    Case 'stop'
-    Case 'test'
-    Case 'uninstall'
-    Case 'update'
+    Case 'list' ;FIXME: implement
+    Case 'pack' ;FIXME: review
+    Case 'rebuild' ;FIXME: review
+    Case 'restart' ;FIXME: review
+    Case 'start' ;FIXME: review
+    Case 'stop' ;FIXME: review
+    Case 'test' ;FIXME: implement
+        #include "./commands/test.au3"
+    Case 'uninstall' ;FIXME: implement
+    Case 'update' ;FIXME: implement
+    Case 'version'
+        ;FIXME: get version
     Case Else
         ConsoleWriteLine(StringFormat('The command %s is not supported.', $command))
         Local $match
