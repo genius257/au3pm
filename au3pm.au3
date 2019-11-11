@@ -46,52 +46,57 @@ ConsoleWriteLine('AutoIt3 package manager by genius257. Prebuild.')
 ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work or be completed at this stage.')
 ConsoleWriteLine()
 
-Global $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
-$command = StringLower($command)
+au3pm($CmdLine)
 
-Switch ($command)
-    Case 'bin' ;FIXME: review
-    Case 'bugs' ;FIXME: review
-    Case 'build' ;FIXME: implement
-        #include "./commands/build.au3"
-    Case 'config'
-        #include "./commands/config.au3"
-    Case 'explore' ;FIXME: review
-    Case 'help', ''
-        ConsoleWriteLine('usage: au3pm (command)'&@CRLF)
-        ConsoleWriteLine('Where (command) is one of: ')
-        ConsoleWriteLine(@TAB & _ArrayToString($commands, ', '))
-    Case 'init'
-        #include "./commands/init.au3"
-    Case 'install'
-        #include "./commands/install.au3"
-    Case 'list' ;FIXME: implement
-    Case 'pack' ;FIXME: review
-    Case 'rebuild' ;FIXME: review
-    Case 'restart' ;FIXME: review
-    Case 'start' ;FIXME: review
-    Case 'stop' ;FIXME: review
-    Case 'test' ;FIXME: implement
-        #include "./commands/test.au3"
-    Case 'uninstall' ;FIXME: implement
-    Case 'update' ;FIXME: implement
-    Case 'version'
-        ;FIXME: get version
-    Case Else
-        ConsoleWriteLine(StringFormat('The command %s is not supported.', $command))
-        Local $match
-        Local $p, $q
-        $p = levenshtein($command, $commands[0])
-        $match = $commands[0]
-        For $c In $commands
-            $q = levenshtein($command, $c)
-            If $q < $p Then
-                $match = $c
-                $p = $q
-            EndIf
-        Next
-        ConsoleWriteLine(@CRLF&"Did you mean: "&$match)
-EndSwitch
+Func au3pm($CmdLine = Null)
+    If $CmdLine == Null Then Local $CmdLine = [0]
+    Local $command = $CmdLine[0] > 0 ? $CmdLine[1] : ''
+    $command = StringLower($command)
+
+    Switch ($command)
+        Case 'bin' ;FIXME: review
+        Case 'bugs' ;FIXME: review
+        Case 'build' ;FIXME: implement
+            #include "./commands/build.au3"
+        Case 'config'
+            #include "./commands/config.au3"
+        Case 'explore' ;FIXME: review
+        Case 'help', ''
+            ConsoleWriteLine('usage: au3pm (command)'&@CRLF)
+            ConsoleWriteLine('Where (command) is one of: ')
+            ConsoleWriteLine(@TAB & _ArrayToString($commands, ', '))
+        Case 'init'
+            #include "./commands/init.au3"
+        Case 'install'
+            #include "./commands/install.au3"
+        Case 'list' ;FIXME: implement
+        Case 'pack' ;FIXME: review
+        Case 'rebuild' ;FIXME: review
+        Case 'restart' ;FIXME: review
+        Case 'start' ;FIXME: review
+        Case 'stop' ;FIXME: review
+        Case 'test' ;FIXME: implement
+            #include "./commands/test.au3"
+        Case 'uninstall' ;FIXME: implement
+        Case 'update' ;FIXME: implement
+        Case 'version'
+            ;FIXME: get version
+        Case Else
+            ConsoleWriteLine(StringFormat('The command %s is not supported.', $command))
+            Local $match
+            Local $p, $q
+            $p = levenshtein($command, $commands[0])
+            $match = $commands[0]
+            For $c In $commands
+                $q = levenshtein($command, $c)
+                If $q < $p Then
+                    $match = $c
+                    $p = $q
+                EndIf
+            Next
+            ConsoleWriteLine(@CRLF&"Did you mean: "&$match)
+    EndSwitch
+EndFunc
 
 Func ConsoleWriteLine($data='')
     ConsoleWrite($data&@CRLF)
