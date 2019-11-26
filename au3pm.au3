@@ -269,3 +269,8 @@ Func ConsoleReadLineSync()
     FileClose($hFile)
     Return $input
 EndFunc
+
+Func _au3pm_addCommand()
+    RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "", "REG_SZ", "C:\Users\Frank\AppData\Local\Programs\au3pm\au3pm.exe")
+    RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "Path", "REG_SZ", "C:\Users\Frank\AppData\Local\Programs\au3pm\")
+EndFunc
