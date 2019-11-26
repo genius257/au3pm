@@ -144,6 +144,11 @@ Func fetchPackage($name, $reference)
     ; In a pure JS fashion, if it looks like a path, it must be a path.
     If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference)
 
+    Switch StringLower($name)
+        Case 'autoit'
+            $reference = fetchAutoIt($reference)
+    EndSwitch
+
     If __SemVer_ConditionParse($reference) Or @error=0 Then; _SemVer_Valid($reference) Then
         Local Static $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
         Local $pathName = $directory.Item($name)
