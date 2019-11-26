@@ -231,7 +231,7 @@ EndFunc
 # Getting AutoIt version with au3pm is a special case, so this function is made to handle this special case.
 #ce
 Func fetchAutoIt($reference)
-    ;get autoit versions (release and beta), resolve reference, download and extract autoit, inject special au3pm.json file into extracted content, return path to folder?
+    ;TODO: get autoit versions (release and beta), resolve reference, download and extract autoit, inject special au3pm.json file into extracted content, return path to folder?
 EndFunc
 
 Func ConsoleReadLineSync()
