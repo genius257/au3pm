@@ -231,7 +231,29 @@ EndFunc
 # Getting AutoIt version with au3pm is a special case, so this function is made to handle this special case.
 #ce
 Func fetchAutoIt($reference)
+    If StringRegExp($reference, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 0) And IsArray(__SemVer_ConditionParse(StringRegExpReplace($reference, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", "$1"))) Then $reference = StringRegExpReplace($reference, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", "$1")
+    Local $versions = _HTMLParser_GetElementsByTagName("a", _HTMLParser_GetFirstStartTag(_HTMLParser(BinaryToString(InetRead('https://www.autoitscript.com/autoit3/files/archive/autoit/', 3))).head))
+    Local $iCount = 0
+    Local $aVersions[UBound($versions, 1)][2]
+    Local $i
+    For $i = 0 To UBound($versions)-1
+        Local $sInnerText = ""
+        Local $aInnerText = _HTMLParser_Element_GetText($versions[$i])
+        For $j = 0 To UBound($aInnerText)-1 Step +1
+            $sInnerText &= __HTMLParser_GetString(__doublyLinkedList_Node($aInnerText[$j]).data)
+        Next
+        If StringRegExp($sInnerText, "(?i)^autoit") And (Not StringRegExp($sInnerText, "(?i)docs")) And StringRegExp($sInnerText, "(?i)\.zip$") Then
+            $aVersions[$iCount][0] = StringRegExp($sInnerText, "v(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 1)[0]
+            $aVersions[$iCount][1] = "https://www.autoitscript.com/autoit3/files/archive/autoit/" & _HTMLParser_Element_GetAttribute("href", $versions[$i])
+            $iCount += 1
+        EndIf
+    Next
+    ReDim $aVersions[$iCount][2]
     ;TODO: get autoit versions (release and beta), resolve reference, download and extract autoit, inject special au3pm.json file into extracted content, return path to folder?
+    $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
+    For $i = 0 To UBound($aVersions, 1) - 1
+        If $aVersions[$i][0] == $sVersion Then Return $aVersions[$i][1]
+    Next
 EndFunc
 
 Func ConsoleReadLineSync()
