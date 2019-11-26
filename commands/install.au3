@@ -64,7 +64,36 @@ If $CmdLine[0] = 1 Then
 
     DirRemove($tmp, 1)
 Else
+    If $CmdLine[0] > 2 Then
+        ConsoleWriteLine("currently only up to two arguemnts in install command are supported.")
+        Exit 1
+    EndIf
+
+    If StringRegExp($CmdLine[2], "^[a-zA-Z \-_0-9]+$", 0) Then
+        ConsoleWriteLine("assuming au3pm package")
+        $a = fetchPackage($CmdLine[2], $CmdLine[0] > 2 ? $CmdLine[3] : "*")
+    ElseIf StringRegExp($CmdLine[2], "^[a-zA-Z -_0-9]+@[\s=v]*(\d+|x|\*)(\.(?:\d+|x|\*)|)(\.(?:\d+|x|\*)|)?\s*(\-[A-Za-z0-9\-\.]+|)\s*(\+[A-Za-z0-9\-\.]+|)\s*$", 0) Then ;FIXME: ranges such as ^3 currently not supported by the regex
+        ConsoleWriteLine("assuming au3pm package with specifed semver rule")
+        $aPackage = StringRegExp($CmdLine[2], "([^@]+)@([^@]+)", 1)
+        $a = fetchPackage($aPackage[0], $aPackage[1])
+        ConsoleWrite($CmdLine[2]&@CRLF)
+        ConsoleWrite($aPackage[0]&@CRLF)
+        ConsoleWrite($aPackage[1]&@CRLF)
+        ConsoleWrite($aPackage&@CRLF)
+    ElseIf StringRegExp($CmdLine[2], "^(([^:\/?#]+):)(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", 0) Then
+        ConsoleWriteLine("assuming direct archive link.")
+    Else
+        ConsoleWriteError(StringFormat('dont know how to handle install parameter: "%s"\n', $CmdLine[2]))
+        Exit 1
+    EndIf
+
+    ConsoleWrite($a&@CRLF)
+
+    ;$url = fetchPackage($CmdLine[2], "*")
+    ;$url = fetchPackage('', $CmdLine[2])
+    ;ConsoleWriteLine($url)
+    Exit 0
     ;folder - symlink in current project
-    ;tarball file - 
+    ;tarball file
     ;au3pm regestry
 EndIf
