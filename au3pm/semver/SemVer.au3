@@ -131,23 +131,30 @@ EndFunc   ;==>__SemVer_ConditionParse
 ; Example .......: No
 ; ===============================================================================================================================
 Func __SemVer_Match($aVerA, $sOp, $aVerB)
-	Local Static $mPredicates[]
+	Local $Predicate = Null
 
-	If UBound($mPredicates) = 0 Then
-		; Initialize the map
-		$mPredicates["="] = _SemVer_Eq
-		$mPredicates[">"] = _SemVer_Gt
-		$mPredicates["<"] = _SemVer_Lt
-		$mPredicates[">="] = _SemVer_Gte
-		$mPredicates["<="] = _SemVer_Lte
-		$mPredicates["!="] = _SemVer_Neq
-		$mPredicates["~"] = _SemVer_ReasonablyClose
-		$mPredicates["^"] = _SemVer_Compatible
-	EndIf
+	Switch $sOp
+		Case "="
+			$Predicate = _SemVer_Eq
+		Case ">"
+			$Predicate = _SemVer_Gt
+		Case "<"
+			$Predicate = _SemVer_Lt
+		Case ">="
+			$Predicate = _SemVer_Gte
+		Case "<="
+			$Predicate = _SemVer_Lte
+		Case "!="
+			$Predicate = _SemVer_Neq
+		Case "~"
+			$Predicate = _SemVer_ReasonablyClose
+		Case "^"
+			$Predicate = _SemVer_Compatible
+		Case Else
+			Return SetError(1, 0, 0) ; Operator not recognised
+	EndSwitch
 
-	If $mPredicates[$sOp] = Null Then Return SetError(1, 0, 0) ; Operator not recognised
-
-	Return $mPredicates[$sOp]($aVerA, $aVerB)
+	Return $Predicate($aVerA, $aVerB)
 EndFunc   ;==>__SemVer_Match
 
 ; #INTERNAL_USE_ONLY# ===========================================================================================================
@@ -640,3 +647,33 @@ EndFunc   ;==>_SemVer_Satisfies
 Func _SemVer_Valid($sVer)
 	Return StringRegExp($sVer, $__SVREGEX_VERSION)
 EndFunc   ;==>_SemVer_Valid
+
+#cs
+# Return the highest version in the list that satisfies the range, or null if none of them do.
+#
+# @author Anders Pedersen (genius257)
+#
+# @param array $versions array of versions
+# @param string $range The version number string
+#
+# @return string|null
+#ce
+Func _SemVer_MaxSatisfying($versions, $range)
+    Local $i
+    Local $max = Null
+
+    For $i = 0 To UBound($versions)-1
+        If Not _SemVer_Satisfies($versions[$i], $range) Then ContinueLoop
+        If (Not $max) Or _SemVer_Compare($max, $versions[$i]) = -1 Then $max = $versions[$i]
+    Next
+
+    Return $max
+EndFunc
+
+Func _SemVer_ValidRange($range)
+	#cs
+	# @see https://docs.npmjs.com/misc/semver#range-grammar
+	#ce
+	Local Static $re = '(?(DEFINE)(?<rangeSet>(?&range)((?&logicalOr)(?&range))*)(?<logicalOr>( )*\|\|( )*)(?<range>(?&hyphen)|(?&simple)( (?&simple))*|)(?<hyphen>(?&partial) - (?&partial))(?<simple>(?&primitive)|(?&partial)|(?&tilde)|(?&caret))(?<primitive>(<|>|>=|<=|=)(?&partial))(?<partial>(?&xr)(\.(?&xr)(\.(?&xr)(?&qualifier)?)?)?)(?<xr>x|X|\*|(?&nr))(?<nr>0|[1-9]([0-9])*)(?<tilde>~(?&partial))(?<caret>\^(?&partial))(?<qualifier>(-(?&pre))?(\+(?&build))?)(?<pre>(?&parts))(?<build>(?&parts))(?<parts>(?&part)(\.(?&part))*)(?<part>(?&nr)|[-0-9A-Za-z]+))^(?&rangeSet)$'
+	Return Not Not StringRegExp($range, $re)
+EndFunc
