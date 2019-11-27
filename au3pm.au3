@@ -254,6 +254,57 @@ Func fetchAutoIt($reference)
     Return SetError(1)
 EndFunc
 
+#cs
+# Generate au3pm tmp dir string
+#
+# @return string
+#ce
+Func generateTempDir()
+    $tmp = @TempDir & '\' & StringFormat('au3pm %s-%s-%s %s-%s-%s %s', @MDAY, @MON, @YEAR, @HOUR, @MIN, @SEC, @MSEC); & '\'
+    Return $tmp
+EndFunc
+
+#cs
+# Download and extracts package from url
+#
+# @param string $url                  Package url
+# @param string $name                 Package name
+# @param bool   $bInstallDependencies If true, installs nested dependecies
+#
+# @error 1 Failure creating %tmp% folder
+# @error 2 Failure downloading
+# @error 3 Failure extracting
+# @error 4 Failure moving extracted content to au3pm folder
+# @error 5 Failure removing %tmp% folder
+#ce
+Func InstallPackage($url, $name, $bInstallDependencies = False)
+    Local $tmp = generateTempDir()
+    If DirCreate($tmp) <> 1 Then Return SetError(1)
+
+    Local $tmp_file = _TempFile($tmp, '~')
+
+    ;Downloading
+
+    InetGet($url, $tmp_file, 16, 0)
+    If @error <> 0 Then
+        Return SetError(2)
+    EndIf
+
+    ;Extracting...
+
+    If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
+        Return SetError(3)
+    EndIf
+
+    If Not FileExists(@WorkingDir & '\au3pm\') Then DirCreate(@WorkingDir & '\au3pm\') ;TODO: test for failure
+
+    If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$name&'\') <> 1 Then
+        Return SetError(4)
+    EndIf
+
+    If DirRemove($tmp, 1) <> 1 Then Return SetError(5)
+EndFunc
+
 Func ConsoleReadLineSync()
     Local $hFile = _WinAPI_CreateFile('CON', 2, 2)
     Local $input = ""

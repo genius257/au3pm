@@ -71,15 +71,19 @@ Else
 
     If StringRegExp($CmdLine[2], "^[a-zA-Z \-_0-9]+$", 0) Then
         ConsoleWriteLine("assuming au3pm package")
-        $a = fetchPackage($CmdLine[2], $CmdLine[0] > 2 ? $CmdLine[3] : "*")
+        $url = fetchPackage($CmdLine[2], $CmdLine[0] > 2 ? $CmdLine[3] : "*")
+        $dependency = $CmdLine[2]
     ElseIf StringRegExp($CmdLine[2], "^[a-zA-Z -_0-9]+@[\s=v]*(\d+|x|\*)(\.(?:\d+|x|\*)|)(\.(?:\d+|x|\*)|)?\s*(\-[A-Za-z0-9\-\.]+|)\s*(\+[A-Za-z0-9\-\.]+|)\s*$", 0) Then ;FIXME: ranges such as ^3 currently not supported by the regex
         ConsoleWriteLine("assuming au3pm package with specifed semver rule")
         $aPackage = StringRegExp($CmdLine[2], "([^@]+)@([^@]+)", 1)
-        $a = fetchPackage($aPackage[0], $aPackage[1])
+        $url = fetchPackage($aPackage[0], $aPackage[1])
+        $dependency = $aPackage[0]
     ElseIf StringRegExp($CmdLine[2], "^(([^:\/?#]+):)(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", 0) Then
         ConsoleWriteLine("assuming direct archive link.")
+        ConsoleWriteErrorLine("not yet implemented!")
+        Exit 1
     Else
-        ConsoleWriteError(StringFormat('dont know how to handle install parameter: "%s"\n', $CmdLine[2]))
+        ConsoleWriteError(StringFormat('Dont know how to handle install parameter: "%s"\n', $CmdLine[2]))
         Exit 1
     EndIf
 
@@ -87,11 +91,14 @@ Else
         ConsoleWriteError("No package found, matching your criteria")
         Exit 1
     EndIf
-    ConsoleWrite($a&@CRLF)
 
-    ;$url = fetchPackage($CmdLine[2], "*")
-    ;$url = fetchPackage('', $CmdLine[2])
-    ;ConsoleWriteLine($url)
+    InstallPackage($url, $dependency)
+    If @error <> 0 Then
+        ConsoleWriteErrorLine(@error)
+        ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
+        Exit 1
+    EndIf
+
     Exit 0
     ;folder - symlink in current project
     ;tarball file
