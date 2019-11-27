@@ -102,6 +102,10 @@ Func ConsoleWriteLine($data='')
     ConsoleWrite($data&@CRLF)
 EndFunc
 
+Func ConsoleWriteErrorLine($data='')
+    ConsoleWriteError($data&@CRLF)
+EndFunc
+
 Func levenshtein($a, $b); source: https://www.autoitscript.com/forum/topic/179886-comparing-strings/
     Local $i, $j, $cost, $d[1], $min1, $min2, $min3
 
