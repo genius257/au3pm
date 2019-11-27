@@ -171,18 +171,6 @@ Func fetchPackage($name, $reference)
     Return $response
 EndFunc
 
-Func _SemVer_MaxSatisfying($versions, $range)
-    Local $i
-    Local $max
-
-    For $i = 0 To UBound($versions)-1
-        If Not _SemVer_Satisfies($versions[$i], $range) Then ContinueLoop
-        If (Not $max) Or _SemVer_Compare($max, $versions[$i]) = -1 Then $max = $versions[$i]
-    Next
-
-    Return $max
-EndFunc
-
 Func getPackageDependencyTree($dependencies)
     Local Static $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
     Local $resolvedDependencies = ObjCreate("Scripting.Dictionary")
