@@ -76,10 +76,6 @@ Else
         ConsoleWriteLine("assuming au3pm package with specifed semver rule")
         $aPackage = StringRegExp($CmdLine[2], "([^@]+)@([^@]+)", 1)
         $a = fetchPackage($aPackage[0], $aPackage[1])
-        ConsoleWrite($CmdLine[2]&@CRLF)
-        ConsoleWrite($aPackage[0]&@CRLF)
-        ConsoleWrite($aPackage[1]&@CRLF)
-        ConsoleWrite($aPackage&@CRLF)
     ElseIf StringRegExp($CmdLine[2], "^(([^:\/?#]+):)(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", 0) Then
         ConsoleWriteLine("assuming direct archive link.")
     Else
@@ -87,6 +83,10 @@ Else
         Exit 1
     EndIf
 
+    If @error <> 0 Then
+        ConsoleWriteError("No package found, matching your criteria")
+        Exit 1
+    EndIf
     ConsoleWrite($a&@CRLF)
 
     ;$url = fetchPackage($CmdLine[2], "*")

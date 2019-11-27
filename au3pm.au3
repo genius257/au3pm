@@ -152,6 +152,7 @@ Func fetchPackage($name, $reference)
     Switch StringLower($name)
         Case 'autoit'
             $reference = fetchAutoIt($reference)
+            If @error <> 0 Then Return SetError(@error)
     EndSwitch
 
     If __SemVer_ConditionParse($reference) Or @error=0 Then; _SemVer_Valid($reference) Then
@@ -250,6 +251,7 @@ Func fetchAutoIt($reference)
     For $i = 0 To UBound($aVersions, 1) - 1
         If $aVersions[$i][0] == $sVersion Then Return $aVersions[$i][1]
     Next
+    Return SetError(1)
 EndFunc
 
 Func ConsoleReadLineSync()
