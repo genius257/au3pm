@@ -47,6 +47,7 @@ ConsoleWriteLine('Disclaimer: this is a prebuild. NOTHING is guaranteed to work 
 ConsoleWriteLine()
 
 au3pm($CmdLine)
+Exit @error
 
 Func au3pm($CmdLine = Null)
     If $CmdLine == Null Then Local $CmdLine = [0]
@@ -166,7 +167,10 @@ Func fetchPackage($name, $reference)
 
     Return $reference
     Local $response = BinaryToString(InetRead($reference, 16))
-    If @error<> 0 Then ConsoleWrite(StringFormat('Couldn''''t fetch package "%s"\n', $response))
+    If @error<> 0 Then
+        ConsoleWriteErrorLine(StringFormat('Couldn''''t fetch package "%s"', $response))
+        Return SetError(1)
+    EndIf
 
     Return $response
 EndFunc
