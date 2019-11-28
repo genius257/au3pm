@@ -21,9 +21,6 @@ If $CmdLine[0] = 1 Then
     DirRemove(@WorkingDir & '\au3pm\', 1)
     DirCreate(@WorkingDir & '\au3pm\')
 
-    $tmp = @TempDir & '\' & StringFormat('au3pm %s-%s-%s %s-%s-%s %s', @MDAY, @MON, @YEAR, @HOUR, @MIN, @SEC, @MSEC); & '\'
-    DirCreate($tmp)
-
     For $dependency In $dependencies
         ConsoleWrite($dependency&@CRLF)
         $info = $dependencies.Item($dependency)
@@ -40,29 +37,12 @@ If $CmdLine[0] = 1 Then
             Exit 1
         EndIf
 
-        ConsoleWriteLine('Downloading ' & $info)
-        ConsoleWriteLine()
-        $tmp_file = _TempFile($tmp, '~')
-
-        InetGet($url, $tmp_file, 16, 0)
+        InstallPackage($url, $dependency)
         If @error <> 0 Then
-            ConsoleWriteLine('Failure downloading. Exitting...')
-            Exit 1
-        EndIf
-
-        ConsoleWriteLine('Extracting...')
-
-        If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
-            ConsoleWriteLine('Failure extracting. Exitting...')
-            Exit 1
-        EndIf
-        If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$dependency&'\') <> 1 Then
-            ConsoleWriteLine('Failure moving extracted content to au3pm folder. Exitting...')
+            ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
             Exit 1
         EndIf
     Next
-
-    DirRemove($tmp, 1)
 Else
     If $CmdLine[0] > 2 Then
         ConsoleWriteLine("currently only up to two arguemnts in install command are supported.")
@@ -94,7 +74,6 @@ Else
 
     InstallPackage($url, $dependency)
     If @error <> 0 Then
-        ConsoleWriteErrorLine(@error)
         ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
         Exit 1
     EndIf
