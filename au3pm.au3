@@ -303,6 +303,9 @@ Func InstallPackage($url, $name, $bInstallDependencies = False)
     EndIf
 
     If DirRemove($tmp, 1) <> 1 Then Return SetError(5)
+
+    ;FIXME: update au3pm.json
+    ;FIXME: update au3pm.lock
 EndFunc
 
 Func ConsoleReadLineSync()
