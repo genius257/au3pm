@@ -65,7 +65,7 @@ Func au3pm($CmdLine = Null)
         Case 'help', ''
             ConsoleWriteLine('usage: au3pm (command)'&@CRLF)
             ConsoleWriteLine('Where (command) is one of: ')
-            ConsoleWriteLine(@TAB & _ArrayToString($commands, ', '))
+            ConsoleWriteLine('    ' & _ArrayToString($commands, ', '))
         Case 'init'
             #include "./commands/init.au3"
         Case 'install'
