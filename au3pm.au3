@@ -188,10 +188,7 @@ Func getPackageDependencyTree($dependencies)
         Local $entry = $queue.Item(0)
         $queue.RemoveAt(0)
         Local $keys = $entry.Keys(); FIXME: Array_AsList($entry.Keys())
-        While 1
-            If $keys.Count() <= 0 Then ExitLoop
-            Local $keyEntry = $keys.Item(0)
-            $keys.RemoveAt(0)
+        For $keyEntry In $keys
             ConsoleWrite($keyEntry&@CRLF)
             Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $keyEntry, "au3pm.json"), $INET_FORCEBYPASS))))[0]
             Local $range = $entry.Item($keyEntry)
@@ -212,7 +209,7 @@ Func getPackageDependencyTree($dependencies)
             Local $package = ObjCreate("Scripting.Dictionary"); FIXME: get au3json file from package repo
                 $package.Add('dependencies', ObjCreate("Scripting.Dictionary")) ;NOTE: quickfix for not getting the au3json from the package repo
             $queue.Add($package.Item('dependencies'))
-        WEnd
+        Next
     WEnd
 
     return $resolvedDependencies
