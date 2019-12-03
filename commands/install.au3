@@ -17,6 +17,9 @@ If $CmdLine[0] = 1 Then
         Exit 0
     EndIf
 
+    $resolvedDependencies = getPackageDependencyTree($dependencies)
+    $dependencies = $resolvedDependencies
+
     ConsoleWriteLine('Clearing dependency folder'&@CRLF)
     DirRemove(@WorkingDir & '\au3pm\', 1)
     DirCreate(@WorkingDir & '\au3pm\')
@@ -72,11 +75,15 @@ Else
         Exit 1
     EndIf
 
+    ; TODO: use getPackageDependencyTree before installing, to handle dependencies!
+
     InstallPackage($url, $dependency)
     If @error <> 0 Then
         ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
         Exit 1
     EndIf
+
+    ; add new package ref to au3pm.json
 
     Exit 0
     ;folder - symlink in current project
