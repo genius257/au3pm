@@ -189,10 +189,9 @@ Func getPackageDependencyTree($dependencies)
         $queue.RemoveAt(0)
         Local $keys = $entry.Keys(); FIXME: Array_AsList($entry.Keys())
         For $keyEntry In $keys
-            ConsoleWrite($keyEntry&@CRLF)
             Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $keyEntry, "au3pm.json"), $INET_FORCEBYPASS))))[0]
             Local $range = $entry.Item($keyEntry)
-            Local $versions = $packageDirectory.Item('versions')
+            Local $versions = $packageDirectory.Item('versions').keys
             Local $maxSatisfying = _SemVer_MaxSatisfying($versions, $range)
             Local $__ref = $resolvedDependencies.Keys()
             If _ArraySearch($__ref, $keyEntry) > -1 Then ;Not $resolvedDependencies.__get($keyEntry) = "" Then
