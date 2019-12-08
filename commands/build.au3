@@ -1,7 +1,5 @@
 #include-once
 
-ConsoleWriteLine("Not yet implemented.")
+Local $parameters = [2, 'run', 'build']
 
-; au3pm run-script build
-
-Exit 1
+au3pm($parameters)

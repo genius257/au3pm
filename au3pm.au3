@@ -32,6 +32,7 @@ Global $commands = [ _
     'pack', _
     'rebuild', _
     'restart', _
+    'run', _
     'start', _
     'stop', _
     'test', _
@@ -57,7 +58,7 @@ Func au3pm($CmdLine = Null)
     Switch ($command)
         Case 'bin' ;FIXME: review
         Case 'bugs' ;FIXME: review
-        Case 'build' ;FIXME: implement
+        Case 'build'
             #include "./commands/build.au3"
         Case 'config'
             #include "./commands/config.au3"
@@ -74,9 +75,11 @@ Func au3pm($CmdLine = Null)
         Case 'pack' ;FIXME: review
         Case 'rebuild' ;FIXME: review
         Case 'restart' ;FIXME: review
+        Case 'run'
+            #include "./commands/run.au3"
         Case 'start' ;FIXME: review
         Case 'stop' ;FIXME: review
-        Case 'test' ;FIXME: implement
+        Case 'test'
             #include "./commands/test.au3"
         Case 'uninstall' ;FIXME: implement
         Case 'update' ;FIXME: implement
