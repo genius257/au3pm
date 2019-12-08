@@ -98,7 +98,7 @@ Else
         Exit 0
     EndIf
 
-    InstallPackage($url, $dependency, Execute("$CmdLine[3]") == "-g")
+    InstallPackage($url, $dependency);, False, Execute("$CmdLine[3]") == "-g")
     If @error <> 0 Then
         ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
         Exit 1
