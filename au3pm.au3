@@ -153,6 +153,9 @@ Func fetchPackage($name, $reference)
     If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference)
 
     Switch StringLower($name)
+        Case 'au3pm'
+            $reference = fetchAu3pm($reference)
+            If @error <> 0 Then Return SetError(@error)
         Case 'autoit'
             $reference = fetchAutoIt($reference)
             If @error <> 0 Then Return SetError(@error)

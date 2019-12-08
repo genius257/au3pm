@@ -47,11 +47,6 @@ If $CmdLine[0] = 1 Then
         EndIf
     Next
 Else
-    If $CmdLine[0] > 2 Then
-        ConsoleWriteLine("currently only up to two arguemnts in install command are supported.")
-        Exit 1
-    EndIf
-
     If StringRegExp($CmdLine[2], "^[a-zA-Z \-_0-9]+$", 0) Then
         ConsoleWriteLine("assuming au3pm package")
         $url = fetchPackage($CmdLine[2], $CmdLine[0] > 2 ? $CmdLine[3] : "*")
@@ -77,7 +72,33 @@ Else
 
     ; TODO: use getPackageDependencyTree before installing, to handle dependencies!
 
-    InstallPackage($url, $dependency)
+    If $dependency == "au3pm" Then
+        If Execute("$CmdLine[3]") == "-g" Then
+            $path = @LocalAppDataDir&"\Programs\au3pm\_au3pm.exe"
+            $destination = @LocalAppDataDir&"\Programs\au3pm\au3pm.exe"
+            InetGet($url, $path, 16)
+            If @error <> 0 Then
+                FileDelete($path)
+                ConsoleWriteErrorLine(StringFormat("An error occured when getting %s", $dependency))
+                Exit 1
+            EndIf
+            If FileExists($destination) Then
+                ConsoleWriteLine(StringFormat("replacing current %s", $dependency))
+                ConsoleWriteLine(StringFormat("%s => %s", FileGetVersion($destination), FileGetVersion($path))
+                FileDelete($destination)
+                FileMove($path, $destination)
+                _WindowsInstaller_registerSoftware()
+            Else
+                ConsoleWriteLine(StringFormat("installing %s for current user", $dependency))
+                FileMove($path, $destination)
+                _WindowsInstaller_registerSoftware()
+                _au3pm_addCommand()
+            EndIf
+        EndIf
+        Exit 0
+    EndIf
+
+    InstallPackage($url, $dependency, Execute("$CmdLine[3]") == "-g")
     If @error <> 0 Then
         ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
         Exit 1
