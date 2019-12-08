@@ -322,6 +322,7 @@ Func ConsoleReadLineSync()
 EndFunc
 
 Func _WindowsInstaller_registerSoftware()
+    ;TODO: fix version information.
     RegRead("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "")
     If @error = 0 Then Return SetError(1);the registry key already exists!
 
