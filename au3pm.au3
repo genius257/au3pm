@@ -324,7 +324,7 @@ EndFunc
 Func _WindowsInstaller_registerSoftware()
     ;TODO: fix version information.
     RegRead("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "")
-    If @error = 0 Then Return SetError(1);the registry key already exists!
+    ;If @error = 0 Then Return SetError(1);the registry key already exists!
 
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "DisplayIcon", "REG_SZ", @LocalAppDataDir&"\Programs\au3pm\au3pm.exe")
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "DisplayName", "REG_SZ", "AutoIt3 Package Manager")
