@@ -347,6 +347,8 @@ Func _WindowsInstaller_registerSoftware()
 EndFunc
 
 Func _au3pm_addCommand()
+    RegRead("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "")
+    If @error = 0 Then Return SetError(1);the registry key already exists!
     RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "", "REG_SZ", @LocalAppDataDir&"\Programs\au3pm\au3pm.exe")
     RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "Path", "REG_SZ", @LocalAppDataDir&"\Programs\au3pm\")
 EndFunc
