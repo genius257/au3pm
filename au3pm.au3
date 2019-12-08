@@ -253,6 +253,21 @@ Func fetchAutoIt($reference)
     Return SetError(1)
 EndFunc
 
+Func fetchAu3pm($reference)
+    Local $versions = json_parse(json_lex(BinaryToString(InetRead('https://api.github.com/repos/genius257/au3pm/releases'))))
+    Local $aVersions[$versions.Count][2]
+    Local $i
+    For $i = 0 To $versions.Count-1
+        $aVersions[$i][0] = $versions.Item($i).Item('tag_name')
+        $aVersions[$i][0] = $versions.Item($i).Item('assets').Item(0).Item('browser_download_url')
+    Next
+    Local $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
+    For $i = 0 To UBound($aVersions, 1) - 1
+        If $aVersions[$i][0] == $sVersion Then Return $aVersions[$i][1]
+    Next
+    Return SetError(1)
+EndFunc
+
 #cs
 # Generate au3pm tmp dir string
 #
