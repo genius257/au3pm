@@ -81,7 +81,7 @@ Func au3pm($CmdLine = Null)
         Case 'uninstall' ;FIXME: implement
         Case 'update' ;FIXME: implement
         Case 'version'
-            ;FIXME: get version
+            #include "./commands/version.au3"
         Case Else
             ConsoleWriteLine(StringFormat('The command %s is not supported.', $command))
             Local $match
