@@ -365,3 +365,59 @@ Func _au3pm_addCommand()
     RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "", "REG_SZ", @LocalAppDataDir&"\Programs\au3pm\au3pm.exe")
     RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "Path", "REG_SZ", @LocalAppDataDir&"\Programs\au3pm\")
 EndFunc
+
+Func json_stringify($json)
+    Local Static $CLSID_Dictionary = ObjName(ObjCreate("Scripting.Dictionary"), 6)
+    Local Static $CLSID_ArrayList = ObjName(ObjCreate("System.Collections.ArrayList"), 6)
+    Local $sJson = ""
+
+    Switch VarGetType($json)
+        Case "Array"
+            $sJson = "["
+            Local $value
+            For $value In $json
+                $sJson &= json_stringify($value) & ","
+            Next
+            $sJson = StringRegExpReplace($sJson, '[,]$', '') & "]"
+        Case "Bool"
+            $sJson = $json ? "true" : "false"
+        Case "DLLStruct"
+            $sJson = '"[object DLLStruct]"'
+        Case "Int32", "Int64", "Double"
+            $sJson = String($json)
+        Case "Keyword"
+            Switch $json
+                Case Null
+                    $sJson = "null"
+                Case Default
+                    $sJson = '""'
+                Case Else
+                    ContinueCase 2
+            EndSwitch
+        Case "Object"
+            Switch ObjName($json, 6)
+                Case $CLSID_ArrayList
+                    $sJson = "["
+                    Local $value
+                    For $value In $json
+                        $sJson &= json_stringify($value) & ","
+                    Next
+                    $sJson = StringRegExpReplace($sJson, '[,]$', '') & "]"
+                Case $CLSID_Dictionary
+                    $sJson &= "{"
+                    Local $key
+                    For $key In $json
+                        $sJson &= json_stringify($key) & ':' & json_stringify($json.Item($key)) & ","
+                    Next
+                    $sJson = StringRegExpReplace($sJson, '[,]$', '') & "}"
+                Case Else
+                    Return StringFormat('"[object %s]"', ObjName($json, 1))
+            EndSwitch
+        Case "String"
+            $sJson = StringFormat('"%s"', $json)
+        Case Else
+            ConsoleWrite(VarGetType($json)&@CRLF)
+            Exit MsgBox(0, "", VarGetType($json))
+    EndSwitch
+    Return $sJson
+EndFunc
