@@ -1,10 +1,3 @@
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=build\au3pm.exe
-#AutoIt3Wrapper_Outfile_x64=build\au3pm_x64.exe
-#AutoIt3Wrapper_UseX64=n
-#AutoIt3Wrapper_Change2CUI=y
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-
 #include <WinAPIProc.au3>
 #include <WinAPIFiles.au3>
 #include <File.au3>
