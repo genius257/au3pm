@@ -15,6 +15,8 @@
 #include "au3pm\semver\SemVer.au3"
 #include "au3pm\html\HTMLParser.au3"
 
+FileInstall("7za.exe" , @ScriptDir & "\7za.exe")
+
 ;FIXME: support au3pm-lock.json
 
 Global Const $registry = "https://raw.githubusercontent.com/au3pm/action-test/master/"
