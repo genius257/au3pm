@@ -79,7 +79,8 @@ Func au3pm($CmdLine = Null)
         Case 'stop' ;FIXME: review
         Case 'test'
             #include "./commands/test.au3"
-        Case 'uninstall' ;FIXME: implement
+        Case 'uninstall'
+            #include "./commands/uninstall.au3"
         Case 'update' ;FIXME: implement
         Case 'version'
             #include "./commands/version.au3"
