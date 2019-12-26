@@ -318,6 +318,12 @@ Func InstallPackage($url, $name, $bInstallDependencies = False)
     EndIf
 
     If DirRemove($tmp, 1) <> 1 Then Return SetError(5)
+EndFunc
+
+Func UninstallPackage($name)
+    $path = @WorkingDir & '\au3pm\' & $name & '\'
+    If Not FileExists($path) Then Return SetError(1)
+    DirRemove($path)
 
     ;FIXME: update au3pm.json
     ;FIXME: update au3pm.lock
