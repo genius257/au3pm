@@ -14,6 +14,9 @@ FileInstall("7za.exe" , @ScriptDir & "\7za.exe")
 
 Global Const $registry = "https://raw.githubusercontent.com/au3pm/action-test/master/"
 
+Global Const $__au3pm_json_path = @WorkingDir & "\au3pm.json"
+Global Const $__au3pm_lock_path = @WorkingDir & "\au3pm-lock.json"
+
 Global $commands = [ _
     'bin', _
     'bugs', _
@@ -420,4 +423,40 @@ Func json_stringify($json)
             Exit MsgBox(0, "", VarGetType($json))
     EndSwitch
     Return $sJson
+EndFunc
+
+Func au3pm_json_load($sFile = $__au3pm_json_path)
+    Local $sJson = '{"version":"1.0.0","name":"","description":"","author":"","main":"","dependencies":{},"scripts":{},"licence":""}'
+    If FileExists($sFile) Then
+        $sJson = FileRead($sFile)
+    EndIf
+    Return json_parse(json_lex($sJson))[0]
+EndFunc
+
+Func au3pm_json_save($json)
+    If Not IsString($json) Then
+        $json = json_stringify($json)
+    EndIf
+
+    Local $hFile = FileOpen($__au3pm_json_path, 2)
+    FileWrite($hFile, $json)
+    FileClose($hFile)
+EndFunc
+
+Func au3pm_lock_load($sFile = $__au3pm_lock_path)
+    Local $sJson = '{"hash":"","packages":{},"packages-dev":{}}'
+    If FileExists($sFile) Then
+        $sJson = FileRead($sFile)
+    EndIf
+    Return json_parse(json_lex($sJson))[0]
+EndFunc
+
+Func au3pm_lock_save($json)
+    If Not IsString($json) Then
+        $json = json_stringify($json)
+    EndIf
+
+    Local $hFile = FileOpen($__au3pm_lock_path, 2)
+    FileWrite($hFile, $json)
+    FileClose($hFile)
 EndFunc

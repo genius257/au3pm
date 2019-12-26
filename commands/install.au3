@@ -23,6 +23,8 @@ If $CmdLine[0] = 1 Then
     ConsoleWriteLine('Clearing dependency folder'&@CRLF)
     DirRemove(@WorkingDir & '\au3pm\', 1)
     DirCreate(@WorkingDir & '\au3pm\')
+    FileDelete($__au3pm_lock_path)
+    $lock = au3pm_lock_load()
 
     For $dependency In $dependencies
         ConsoleWrite($dependency&@CRLF)
@@ -45,17 +47,23 @@ If $CmdLine[0] = 1 Then
             ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
             Exit 1
         EndIf
+        If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
+        $lock.Item("packages").Add($dependency, $url)
     Next
+    au3pm_lock_save($lock)
 Else
+    $version = "*"
     If StringRegExp($CmdLine[2], "^[a-zA-Z \-_0-9]+$", 0) Then
         ConsoleWriteLine("assuming au3pm package")
         $url = fetchPackage($CmdLine[2], $CmdLine[0] > 2 ? $CmdLine[3] : "*")
         $dependency = $CmdLine[2]
+        $version = $CmdLine[0] > 2 ? $CmdLine[3] : "*"
     ElseIf StringRegExp($CmdLine[2], "^[a-zA-Z -_0-9]+@[\s=v]*(\d+|x|\*)(\.(?:\d+|x|\*)|)(\.(?:\d+|x|\*)|)?\s*(\-[A-Za-z0-9\-\.]+|)\s*(\+[A-Za-z0-9\-\.]+|)\s*$", 0) Then ;FIXME: ranges such as ^3 currently not supported by the regex
         ConsoleWriteLine("assuming au3pm package with specifed semver rule")
         $aPackage = StringRegExp($CmdLine[2], "([^@]+)@([^@]+)", 1)
         $url = fetchPackage($aPackage[0], $aPackage[1])
         $dependency = $aPackage[0]
+        $version = $aPackage[1]
     ElseIf StringRegExp($CmdLine[2], "^(([^:\/?#]+):)(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", 0) Then
         ConsoleWriteLine("assuming direct archive link.")
         ConsoleWriteErrorLine("not yet implemented!")
@@ -98,11 +106,19 @@ Else
         Exit 0
     EndIf
 
+    $au3pm = au3pm_json_load()
+    $lock = au3pm_lock_load()
     InstallPackage($url, $dependency);, False, Execute("$CmdLine[3]") == "-g")
     If @error <> 0 Then
         ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
         Exit 1
     EndIf
+    If $au3pm.Item("dependencies").Exists($dependency) Then $au3pm.Item("dependencies").Remove($dependency)
+    $au3pm.Item("dependencies").Add($dependency, $version)
+    If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
+    $lock.Item("packages").Add($dependency, $url)
+    au3pm_json_save($au3pm)
+    au3pm_lock_save($lock)
 
     ; add new package ref to au3pm.json
 
