@@ -103,6 +103,7 @@ Else
                 _au3pm_addCommand()
             EndIf
         EndIf
+        ;FIXME: support non -g flag?
         Exit 0
     EndIf
 
