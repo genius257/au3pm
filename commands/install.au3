@@ -92,7 +92,7 @@ Else
             EndIf
             If FileExists($destination) Then
                 ConsoleWriteLine(StringFormat("replacing current %s", $dependency))
-                ConsoleWriteLine(StringFormat("%s => %s", FileGetVersion($destination), FileGetVersion($path))
+                ConsoleWriteLine(StringFormat("%s => %s", FileGetVersion($destination), FileGetVersion($path)))
                 FileDelete($destination)
                 FileMove($path, $destination)
                 _WindowsInstaller_registerSoftware()
