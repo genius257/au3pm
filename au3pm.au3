@@ -69,7 +69,8 @@ Func au3pm($CmdLine = Null)
             #include "./commands/init.au3"
         Case 'install'
             #include "./commands/install.au3"
-        Case 'list' ;FIXME: implement
+        Case 'list'
+            #include "./commands/list.au3"
         Case 'pack' ;FIXME: review
         Case 'rebuild' ;FIXME: review
         Case 'restart' ;FIXME: review
@@ -219,7 +220,7 @@ Func getPackageDependencyTree($dependencies)
     return $resolvedDependencies
 EndFunc
 
-Func getPackageDependencies()
+Func getPackageDependencies($dependency, $range)
     ;
 EndFunc
 
