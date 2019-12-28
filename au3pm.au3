@@ -18,16 +18,12 @@ Global Const $__au3pm_json_path = @WorkingDir & "\au3pm.json"
 Global Const $__au3pm_lock_path = @WorkingDir & "\au3pm-lock.json"
 
 Global $commands = [ _
-    'bin', _
-    'bugs', _
     'build', _
     'config', _
-    'explore', _
     'help', _
     'init', _
     'install', _
     'list', _
-    'pack', _
     'rebuild', _
     'restart', _
     'run', _
@@ -54,13 +50,10 @@ Func au3pm($CmdLine = Null)
     $command = StringLower($command)
 
     Switch ($command)
-        Case 'bin' ;FIXME: review
-        Case 'bugs' ;FIXME: review
         Case 'build'
             #include "./commands/build.au3"
         Case 'config'
             #include "./commands/config.au3"
-        Case 'explore' ;FIXME: review
         Case 'help', ''
             ConsoleWriteLine('usage: au3pm (command)'&@CRLF)
             ConsoleWriteLine('Where (command) is one of: ')
@@ -71,13 +64,12 @@ Func au3pm($CmdLine = Null)
             #include "./commands/install.au3"
         Case 'list'
             #include "./commands/list.au3"
-        Case 'pack' ;FIXME: review
-        Case 'rebuild' ;FIXME: review
-        Case 'restart' ;FIXME: review
+        Case 'rebuild' ;FIXME: implement
+        Case 'restart' ;FIXME: implement
         Case 'run'
             #include "./commands/run.au3"
-        Case 'start' ;FIXME: review
-        Case 'stop' ;FIXME: review
+        Case 'start' ;FIXME: implement
+        Case 'stop' ;FIXME: implement
         Case 'test'
             #include "./commands/test.au3"
         Case 'uninstall'
