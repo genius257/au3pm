@@ -1,6 +1,6 @@
 #include-once
 
-$json = json_parse(json_lex(FileRead(@WorkingDir&"\au3pm.json")))
+$json = au3pm_json_load()
 
 $command = $json.Item('scripts').Item($CmdLine[2])
 
