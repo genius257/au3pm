@@ -64,8 +64,9 @@ Func au3pm($CmdLine = Null)
             #include "./commands/install.au3"
         Case 'list'
             #include "./commands/list.au3"
-        Case 'rebuild' ;FIXME: implement
         Case 'restart' ;FIXME: implement
+        Case 'rebuild'
+            #include "./commands/rebuild.au3"
         Case 'run'
             #include "./commands/run.au3"
         Case 'start' ;FIXME: implement
