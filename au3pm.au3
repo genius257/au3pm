@@ -322,9 +322,6 @@ Func UninstallPackage($name)
     $path = @WorkingDir & '\au3pm\' & $name & '\'
     If Not FileExists($path) Then Return SetError(1)
     DirRemove($path)
-
-    ;FIXME: update au3pm.json
-    ;FIXME: update au3pm.lock
 EndFunc
 
 Func ConsoleReadLineSync()

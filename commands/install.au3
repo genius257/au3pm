@@ -121,10 +121,5 @@ Else
     au3pm_json_save($au3pm)
     au3pm_lock_save($lock)
 
-    ; add new package ref to au3pm.json
-
     Exit 0
-    ;folder - symlink in current project
-    ;tarball file
-    ;au3pm regestry
 EndIf
