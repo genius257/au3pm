@@ -32,13 +32,6 @@ MsgBox(0, "", StringFormat("File Version: %d.%d.%d.%d\n", _
 ))
 #ce
 
-MsgBox(0, "", StringFormat("File Version: %d.%d.%d.%d\n", _
-	BitAND(BitShift($tFIXEDFILEINFO.dwProductVersionMS, 16), 0xffff), _
-	BitAND(BitShift($tFIXEDFILEINFO.dwProductVersionMS, 0), 0xffff), _
-	BitAND(BitShift($tFIXEDFILEINFO.dwProductVersionLS, 16), 0xffff), _
-	BitAND(BitShift($tFIXEDFILEINFO.dwProductVersionLS, 0), 0xffff) _
-))
-
 $json = au3pm_json_load($CmdLine[2])
 
 $version = $json.Item("version")
