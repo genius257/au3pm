@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "name": "au3pm",
+  "description": "AutoIt3 Package Manager",
+  "author": "Anders Pedersen @genius257",
+  "main": "au3pm.au3",
+  "dependencies": {
+    "autoit": ">=3.3.14.4",
+    "html": "^1.0.0",
+    "json": "^1.0.0",
+    "semver": "^1.0.0"
+  },
+  "scripts": {
+    "build": "build.bat"
+  },
+  "licence": "MIT"
+}
