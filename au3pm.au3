@@ -168,13 +168,6 @@ Func fetchPackage($name, $reference)
     EndIf
 
     Return $reference
-    Local $response = BinaryToString(InetRead($reference, 16))
-    If @error<> 0 Then
-        ConsoleWriteErrorLine(StringFormat('Couldn''''t fetch package "%s"', $response))
-        Return SetError(1)
-    EndIf
-
-    Return $response
 EndFunc
 
 Func getPackageDependencyTree($dependencies)
