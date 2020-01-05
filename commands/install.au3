@@ -82,8 +82,8 @@ Else
 
     If $dependency == "au3pm" Then
         If Execute("$CmdLine[3]") == "-g" Then
-            $path = @LocalAppDataDir&"\Programs\au3pm\_au3pm.exe"
-            $destination = @LocalAppDataDir&"\Programs\au3pm\au3pm.exe"
+            $path = @LocalAppDataDir&"\au3pm\_au3pm.exe"
+            $destination = @LocalAppDataDir&"\au3pm\au3pm.exe"
             InetGet($url, $path, 16)
             If @error <> 0 Then
                 FileDelete($path)
