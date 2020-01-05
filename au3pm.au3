@@ -144,7 +144,6 @@ Func levenshtein($a, $b); source: https://www.autoitscript.com/forum/topic/17988
 EndFunc
 
 Func fetchPackage($name, $reference)
-    ;FIXME: if $name = "autoit", resolve reference with AutoIt's weird versioning and inject a au3pm.json into the extracted archive, for add symlink to bin folder and such.
     ; In a pure JS fashion, if it looks like a path, it must be a path.
     If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference)
 
