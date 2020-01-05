@@ -84,6 +84,7 @@ Else
         If Execute("$CmdLine[3]") == "-g" Then
             $path = @LocalAppDataDir&"\au3pm\_au3pm.exe"
             $destination = @LocalAppDataDir&"\au3pm\au3pm.exe"
+            If Not FileExists($destination) DirCreate(_WinAPI_PathRemoveFileSpec($path))
             InetGet($url, $path, 16)
             If @error <> 0 Then
                 FileDelete($path)
