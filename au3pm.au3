@@ -337,7 +337,7 @@ Func _WindowsInstaller_registerSoftware()
 
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "DisplayIcon", "REG_SZ", @LocalAppDataDir&"\au3pm\au3pm.exe")
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "DisplayName", "REG_SZ", "AutoIt3 Package Manager")
-    RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "DisplayVersion", "REG_SZ", "0.1.0")
+    RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "DisplayVersion", "REG_SZ", FileGetVersion(@ScriptFullPath))
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "EstimatedSize", "REG_DWORD", FileGetSize(@ScriptFullPath))
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "HelpLink", "REG_SZ", "https://github.com/genius257/au3pm/issues/")
     RegWrite("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\au3pm", "InstallDate", "REG_SZ", StringFormat("%04i%02i%02i", @YEAR, @MON, @MDAY))
