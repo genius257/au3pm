@@ -356,10 +356,21 @@ Func _WindowsInstaller_registerSoftware()
 EndFunc
 
 Func _au3pm_addCommand()
+    #cs
     RegRead("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "")
     If @error = 0 Then Return SetError(1);the registry key already exists!
     RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "", "REG_SZ", @LocalAppDataDir&"\au3pm\au3pm.exe")
     RegWrite("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\au3pm.exe", "Path", "REG_SZ", @LocalAppDataDir&"\au3pm\")
+    #ce
+    Local $sPath = RegRead("HKEY_CURRENT_USER\Environment", "PATH") ;FIxME: currently key will not be made, if the key does not already exists.
+    If @error <> 0 Then Return SetError(1)
+    Local $iType = @extended
+    If StringInStr($sPath, "\au3pm", @LocalAppDataDir&"\au3pm") Then Return SetError(2);the entry is already added!
+    Local Static $aTypes = ["REG_NONE", "REG_SZ", "REG_EXPAND_SZ", "REG_BINARY", "REG_DWORD", "REG_DWORD_BIG_ENDIAN", "REG_LINK", "REG_MULTI_SZ", "REG_RESOURCE_LIST", "REG_FULL_RESOURCE_DESCRIPTOR", "REG_RESOURCE_REQUIREMENTS_LIST", "REG_QWORD"]
+    Local $sType = VarGetType("$aTypes[$iType]")
+    If @error <> 0 Then Return SetError(3)
+    $sPath &= ";"&@LocalAppDataDir&"\au3pm\"
+    RegWrite("HKEY_CURRENT_USER\Environment", "PATH", $sType, $sPath)
 EndFunc
 
 Func json_stringify($json)
