@@ -371,6 +371,9 @@ Func _au3pm_addCommand()
     If @error <> 0 Then Return SetError(3)
     $sPath &= ";"&@LocalAppDataDir&"\au3pm\"
     RegWrite("HKEY_CURRENT_USER\Environment", "PATH", $sType, $sPath)
+    If @error <> 0 Then Return SetError(4)
+    EnvUpdate()
+    If @error <> 0 Then Return SetError(5)
 EndFunc
 
 Func json_stringify($json)
