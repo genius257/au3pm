@@ -367,7 +367,7 @@ Func _au3pm_addCommand()
     Local $iType = @extended
     If StringInStr($sPath, "\au3pm", @LocalAppDataDir&"\au3pm") Then Return SetError(2);the entry is already added!
     Local Static $aTypes = ["REG_NONE", "REG_SZ", "REG_EXPAND_SZ", "REG_BINARY", "REG_DWORD", "REG_DWORD_BIG_ENDIAN", "REG_LINK", "REG_MULTI_SZ", "REG_RESOURCE_LIST", "REG_FULL_RESOURCE_DESCRIPTOR", "REG_RESOURCE_REQUIREMENTS_LIST", "REG_QWORD"]
-    Local $sType = VarGetType("$aTypes[$iType]")
+    Local $sType = Execute("$aTypes[$iType]")
     If @error <> 0 Then Return SetError(3)
     $sPath &= ";"&@LocalAppDataDir&"\au3pm\"
     RegWrite("HKEY_CURRENT_USER\Environment", "PATH", $sType, $sPath)
