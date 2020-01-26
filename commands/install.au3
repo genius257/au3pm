@@ -57,7 +57,7 @@ Else
         ConsoleWriteLine("assuming au3pm package")
         $url = fetchPackage($CmdLine[2], ($CmdLine[0] > 2 And Not $CmdLine[3] == "-g") ? $CmdLine[3] : "*")
         $dependency = $CmdLine[2]
-        $version = $CmdLine[0] > 2 And Not $CmdLine[3] == "-g" ? $CmdLine[3] : "*"
+        $version = $url[1]
     ElseIf StringRegExp($CmdLine[2], "^[a-zA-Z -_0-9]+@[\s=v]*(\d+|x|\*)(\.(?:\d+|x|\*)|)(\.(?:\d+|x|\*)|)?\s*(\-[A-Za-z0-9\-\.]+|)\s*(\+[A-Za-z0-9\-\.]+|)\s*$", 0) Then ;FIXME: ranges such as ^3 currently not supported by the regex
         ConsoleWriteLine("assuming au3pm package with specifed semver rule")
         $aPackage = StringRegExp($CmdLine[2], "([^@]+)@([^@]+)", 1)
@@ -110,7 +110,7 @@ Else
 
     $au3pm = au3pm_json_load()
     $lock = au3pm_lock_load()
-    InstallPackage($url, $dependency);, False, Execute("$CmdLine[3]") == "-g")
+    InstallPackage($url[2], $dependency);, False, Execute("$CmdLine[3]") == "-g")
     If @error <> 0 Then
         ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
         Exit 1
@@ -118,7 +118,7 @@ Else
     If $au3pm.Item("dependencies").Exists($dependency) Then $au3pm.Item("dependencies").Remove($dependency)
     $au3pm.Item("dependencies").Add($dependency, $version)
     If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
-    $lock.Item("packages").Add($dependency, $url)
+    $lock.Item("packages").Add($dependency, $url[1])
     au3pm_json_save($au3pm)
     au3pm_lock_save($lock)
 
