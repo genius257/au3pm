@@ -164,7 +164,12 @@ Func fetchPackage($name, $reference)
         Local $maxSatisfying = _semver_MaxSatisfying($versions, $reference)
         Local $sha = $packageDirectory.Item('versions').Item($maxSatisfying)
         Local $repo = $packageDirectory.Item('repo')
-        Return fetchPackage($name, StringFormat('https://github.com/%s/archive/%s.zip', $repo, $sha))
+        Local $return = [ _
+            $name, _
+            $maxSatisfying, _
+            fetchPackage($name, StringFormat('https://github.com/%s/archive/%s.zip', $repo, $sha)) _
+        ]
+        Return $return
     EndIf
 
     Return $reference
@@ -183,25 +188,63 @@ Func getPackageDependencyTree($dependencies)
         $queue.RemoveAt(0)
         Local $keys = $entry.Keys(); FIXME: Array_AsList($entry.Keys())
         For $keyEntry In $keys
+            Local $range = $entry.Item($keyEntry)
+            Local $package = fetchPackage($keyEntry, $range)
+            Local $maxSatisfying = $package[1]
+            #cs
             Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $keyEntry, "au3pm.json"), $INET_FORCEBYPASS))))[0]
             Local $range = $entry.Item($keyEntry)
             Local $versions = $packageDirectory.Item('versions').keys
             Local $maxSatisfying = _SemVer_MaxSatisfying($versions, $range)
+            #ce
             Local $__ref = $resolvedDependencies.Keys()
             If _ArraySearch($__ref, $keyEntry) > -1 Then ;Not $resolvedDependencies.__get($keyEntry) = "" Then
+                If $keyEntry = "AutoIt" Then $range = StringRegExpReplace($range, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", "$1")
                 ;TODO: we need atleast the previous range to find a commen acceptable range (i would imagine all the ranges are needed)
-                If Not _SemVer_Satisfies($resolvedDependencies.__get($keyEntry), $range) Then Exit MsgBox(0, "", "dependency version conflict")
+                If Not _SemVer_Satisfies($resolvedDependencies.Item($keyEntry), $range) Then
+                    Exit MsgBox(0, "", "dependency version conflict")
+                EndIf
                 ContinueLoop
                 ;solve diff, if possible or throw "exception"
             EndIf
             $resolvedDependencies.Add($keyEntry, $maxSatisfying)
 
             ;pretend we get package file from package with the version we matched
-            Local $__ref = $directory.Keys()
-            If _ArraySearch($__ref, $keyEntry) = -1 Then Exit MsgBox(0, "", "no match")
-            Local $package = ObjCreate("Scripting.Dictionary"); FIXME: get au3json file from package repo
-                $package.Add('dependencies', ObjCreate("Scripting.Dictionary")) ;NOTE: quickfix for not getting the au3json from the package repo
-            $queue.Add($package.Item('dependencies'))
+            ;Local $__ref = $directory.Keys()
+            ;_ArrayDisplay($__ref)
+            ;If _ArraySearch($__ref, $keyEntry) = -1 Then Exit MsgBox(0, "", "no match")
+            ;Local $package = ObjCreate("Scripting.Dictionary"); FIXME: get au3json file from package repo
+            ;    $package.Add('dependencies', ObjCreate("Scripting.Dictionary")) ;NOTE: quickfix for not getting the au3json from the package repo
+            ;$queue.Add($package.Item('dependencies'))
+
+            Local $tmp = generateTempDir()
+            If DirCreate($tmp) <> 1 Then Return SetError(1)
+
+            Local $tmp_file = _TempFile($tmp, '~')
+
+            ;Downloading
+
+            InetGet($package[2], $tmp_file, 16, 0)
+            If @error <> 0 Then
+                Return SetError(2)
+            EndIf
+
+            ;Extracting...
+
+            If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
+                Return SetError(3)
+            EndIf
+
+            #cs
+            If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$name&'\') <> 1 Then
+                Return SetError(4)
+            EndIf
+            #ce
+
+            local $json = au3pm_json_load(_FileListToArray($tmp&'\out\', '*', 2, True)[1]&'\au3pm.json')
+            $queue.Add($json.Item('dependencies'))
+
+            If DirRemove($tmp, 1) <> 1 Then Return SetError(5)
         Next
     WEnd
 
@@ -239,7 +282,10 @@ Func fetchAutoIt($reference)
     ;TODO: get autoit versions (release and beta), resolve reference, download and extract autoit, inject special au3pm.json file into extracted content, return path to folder?
     $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
     For $i = 0 To UBound($aVersions, 1) - 1
-        If $aVersions[$i][0] == $sVersion Then Return $aVersions[$i][1]
+        If $aVersions[$i][0] == $sVersion Then
+            Local $return = ['autoit', $sVersion, $aVersions[$i][1]]
+            Return $return
+        EndIf
     Next
     Return SetError(1)
 EndFunc
@@ -254,7 +300,10 @@ Func fetchAu3pm($reference)
     Next
     Local $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
     For $i = 0 To UBound($aVersions, 1) - 1
-        If $aVersions[$i][0] == $sVersion Then Return $aVersions[$i][1]
+        If $aVersions[$i][0] == $sVersion Then
+            Local $return = ['au3pm', $sVersion, $aVersions[$i][1]]
+            Return $return
+        EndIf
     Next
     Return SetError(1)
 EndFunc

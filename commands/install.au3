@@ -1,4 +1,5 @@
 If $CmdLine[0] = 1 Then
+    ;; FIXME: use au3pm-lock file, instead if available!
     If Not FileExists(@WorkingDir & '\au3pm.json') Then
         ConsoleWriteLine('au3pm.json not found.')
         Exit 0
@@ -10,7 +11,6 @@ If $CmdLine[0] = 1 Then
         ConsoleWriteLine('problem occured when reading au3pm.json')
         Exit 1
     EndIf
-
     $dependencies = $json.Item('dependencies')
     If @error <> 0 Then
         ConsoleWriteLine('no dependencies found in au3pm.json')
@@ -42,13 +42,13 @@ If $CmdLine[0] = 1 Then
             Exit 1
         EndIf
 
-        InstallPackage($url, $dependency)
+        InstallPackage($url[2], $dependency)
         If @error <> 0 Then
             ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
             Exit 1
         EndIf
         If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
-        $lock.Item("packages").Add($dependency, $url)
+        $lock.Item("packages").Add($dependency, $url[1])
     Next
     au3pm_lock_save($lock)
 Else
@@ -85,7 +85,7 @@ Else
             $path = @LocalAppDataDir&"\au3pm\_au3pm.exe"
             $destination = @LocalAppDataDir&"\au3pm\au3pm.exe"
             If Not FileExists($path) Then DirCreate(_WinAPI_PathRemoveFileSpec($path))
-            InetGet($url, $path, 16)
+            InetGet($url[2], $path, 16)
             If @error <> 0 Then
                 FileDelete($path)
                 ConsoleWriteErrorLine(StringFormat("An error occured when getting %s", $dependency))
