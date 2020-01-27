@@ -358,6 +358,12 @@ Func InstallPackage($url, $name, $bInstallDependencies = False)
         Return SetError(4)
     EndIf
 
+    If FileExists(@WorkingDir & '\au3pm\'&$name&'\au3pm\') Then
+        ConsoleWriteErrorLine('WARNING: au3pm dependency folder within dependency"'&$name&'" already exists! this may cause unexpected results!')
+    Else
+        _WinAPI_CreateSymbolicLink(@WorkingDir & '\au3pm\'&$name&'\au3pm\', "..\", 1)
+    EndIf
+
     If DirRemove($tmp, 1) <> 1 Then Return SetError(5)
 EndFunc
 
