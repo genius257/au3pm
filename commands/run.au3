@@ -9,4 +9,4 @@ EndIf
 
 $command = $json.Item('scripts').Item($CmdLine[2])
 
-Exit RunWait($command)
+Exit RunWait(@ComSpec & " /c " & $command)
