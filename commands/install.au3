@@ -110,15 +110,50 @@ Else
 
     $au3pm = au3pm_json_load()
     $lock = au3pm_lock_load()
-    InstallPackage($url[2], $dependency);, False, Execute("$CmdLine[3]") == "-g")
-    If @error <> 0 Then
-        ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
-        Exit 1
-    EndIf
-    If $au3pm.Item("dependencies").Exists($dependency) Then $au3pm.Item("dependencies").Remove($dependency)
-    $au3pm.Item("dependencies").Add($dependency, $version)
-    If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
-    $lock.Item("packages").Add($dependency, $url[1])
+
+    $originalDependency = $dependency
+    $originalVersion = $url[1]
+    $originalUrl = $url[2]
+
+    $dependencies = json_parse(json_lex('{}'))[0]
+    $dependencies.Add($dependency, $url[1])
+    $resolvedDependencies = getPackageDependencyTree($dependencies)
+    ;ConsoleWriteLine(json_stringify($resolvedDependencies))
+    $dependencies = $resolvedDependencies
+
+    For $dependency In $dependencies
+        ConsoleWrite($dependency&@CRLF)
+        $info = $dependencies.Item($dependency)
+        If StringRegExp($info, '^([^/]+/.*)(?:#(.*))$') Then
+            $url = StringRegExp($info, '^([^/]+/.*?)(?:#(.*))?$', 1)
+            ConsoleWriteLine('Github detected.')
+            $url = StringFormat("https://github.com/%s/archive/%s.zip", $url[0], execute('$url[1]') ? $url[1] : 'master')
+        ElseIf IsArray(__SemVer_ConditionParse($info)) Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
+            ConsoleWriteLine('Semver detected. au3pm repository lookup...')
+            $url = fetchPackage($dependency, $info)
+        Else
+            ConsoleWriteLine(StringFormat('Specification in %s is invalid and/or not supported', $dependency))
+            ConsoleWriteLine('Exitting...')
+            Exit 1
+        EndIf
+
+        InstallPackage($url[2], $dependency)
+        If @error <> 0 Then
+            ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
+            Exit 1
+        EndIf
+        If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
+        $lock.Item("packages").Add($dependency, $url[1])
+    Next
+    ;InstallPackage($url[2], $dependency);, False, Execute("$CmdLine[3]") == "-g")
+    ;If @error <> 0 Then
+    ;    ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
+    ;    Exit 1
+    ;EndIf
+    If $au3pm.Item("dependencies").Exists($originalDependency) Then $au3pm.Item("dependencies").Remove($originalDependency)
+    $au3pm.Item("dependencies").Add($originalDependency, $originalVersion)
+    ;If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
+    ;$lock.Item("packages").Add($dependency, $url[1])
     au3pm_json_save($au3pm)
     au3pm_lock_save($lock)
 
