@@ -217,6 +217,8 @@ Func getPackageDependencyTree($dependencies)
             ;    $package.Add('dependencies', ObjCreate("Scripting.Dictionary")) ;NOTE: quickfix for not getting the au3json from the package repo
             ;$queue.Add($package.Item('dependencies'))
 
+            If StringLower($keyEntry) == "autoit" Then ContinueLoop
+
             Local $tmp = generateTempDir()
             If DirCreate($tmp) <> 1 Then Return SetError(1)
 
