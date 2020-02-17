@@ -10,7 +10,7 @@ EndIf
 
 For $dependency In $dependencies
     $command = @ScriptFullPath
-    
+
     $iERROR = RunWait(@ScriptFullPath & " build", @WorkingDir & "\au3pm\" & $dependency)
     If @error <> 0 Then
         ConsoleWriteErrorLine(StringFormat("%s build failed with code: %s", $dependency, $iERROR))
