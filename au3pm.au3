@@ -30,7 +30,8 @@ Global $commands = [ _
     'start', _
     'stop', _
     'test', _
-    'uninstall', _ ;'update', _
+    'uninstall', _
+    'update', _
     'version' _
 ]
 
@@ -77,8 +78,8 @@ Func au3pm($CmdLine = Null)
             #include "./commands/test.au3"
         Case 'uninstall'
             #include "./commands/uninstall.au3"
-        ;Case 'update'
-            ;#include "./commands/update.au3"
+        Case 'update'
+            #include "./commands/update.au3"
         Case 'version'
             #include "./commands/version.au3"
         Case Else
