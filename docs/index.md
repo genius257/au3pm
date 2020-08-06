@@ -37,6 +37,11 @@
 
 ### TEST
 
+{%- for page in site.html_pages -%}
+  {%- if page.title != nil && page.dir contains "/cli-commands/" %}
+    [{{page.title}}]({{page.url}}) {{page.excerpt}}
+  {% endif -%}
+{%- endfor -%}
 [
   {%- for page in site.html_pages -%}
    {
