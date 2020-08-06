@@ -41,6 +41,12 @@ site url: {{site.url}}
 
 {% for page in site.html_pages %}
   {% if page.title != nil and page.dir contains "/cli-commands/" %}
+page url: {{page.url}}
+
+page dir: {{page.dir}}
+
+page path: {{page.path}}
+
 * [{{page.title}}]({{site.url}}{{page.url}}) {{page.excerpt}}
   {% endif %}
 {% endfor %}
