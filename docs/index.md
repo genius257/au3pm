@@ -39,6 +39,7 @@
 
 {% for page in site.html_pages %}
   {% if page.title != nil and page.dir contains "/cli-commands/" %}
-    <a href="{{page.url}}">{{page.title}}</a> {{page.excerpt}}
+<a href="{{page.url}}">{{page.title}}</a> {{page.excerpt}}
+[{{page.title}}]({{page.url}}) {{page.excerpt}}
   {% endif %}
 {% endfor %}
