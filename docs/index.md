@@ -34,3 +34,18 @@
 * [registry](registry.md) The AutoIt3 Package Registry
 * [removal](removal.md) Cleaning the Slate
 * [scripts](scripts.md) How au3pm handles the "scripts" field
+
+### TEST
+
+{%- for collection in site.collections %}
+  {%- for page in collection.cli-commands -%}
+   {
+     {%- if page.title != nil %}
+        "title"    : "{{ page.title | escape }}",
+        "url"      : "{{ site.baseurl }}{{ page.url }}",
+        "date"     : "{{ page.date }}"
+     {% endif -%}
+   }{% unless forloop.last %},{% endunless %}
+  {%- endfor -%}
+  {% endfor -%}
+]
