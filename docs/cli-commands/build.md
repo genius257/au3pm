@@ -1,5 +1,5 @@
 # Build
-## Build a package
+Build a package
 
 ### Synopsis
 
