@@ -37,8 +37,8 @@
 
 ### TEST
 
-{%- for collection in site.collections %}
-  {%- for page in collection.cli-commands -%}
+[
+  {%- for page in site.html_pages -%}
    {
      {%- if page.title != nil %}
         "title"    : "{{ page.title | escape }}",
@@ -47,5 +47,4 @@
      {% endif -%}
    }{% unless forloop.last %},{% endunless %}
   {%- endfor -%}
-  {% endfor -%}
 ]
