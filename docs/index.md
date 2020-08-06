@@ -38,7 +38,7 @@
 ### TEST
 
 {% for page in site.html_pages %}
-  {% if page.title != nil && page.dir contains "/cli-commands/" %}
+  {% if page.title != nil and page.dir contains "/cli-commands/" %}
     <a href="{{page.url}}">{{page.title}}</a> {{page.excerpt}}
   {% endif %}
 {% endfor %}
