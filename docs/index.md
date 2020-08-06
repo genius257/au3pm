@@ -39,17 +39,6 @@
 
 {%- for page in site.html_pages -%}
   {%- if page.title != nil && page.dir contains "/cli-commands/" %}
-    [{{page.title}}]({{page.url}}) {{page.excerpt}}
+    <a href="{{page.url}}">{{page.title}}</a> {{page.excerpt}}
   {% endif -%}
 {%- endfor -%}
-[
-  {%- for page in site.html_pages -%}
-   {
-     {%- if page.title != nil %}
-        "title"    : "{{ page.title | escape }}",
-        "url"      : "{{ site.baseurl }}{{ page.url }}",
-        "date"     : "{{ page.date }}"
-     {% endif -%}
-   }{% unless forloop.last %},{% endunless %}
-  {%- endfor -%}
-]
