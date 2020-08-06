@@ -39,7 +39,7 @@
 
 site url: {{site.url}}
 
-relative_url?: {{relative_url}}
+relative_url?: {{ '/' | relative_url}}
 
 absolute_url: {{ '/' | absolute_url }}
 
@@ -51,6 +51,6 @@ page dir: {{page.dir}}
 
 page path: {{page.path}}
 
-* [{{page.title}}]({{site.url}}{{page.url}}) {{page.excerpt}}
+* [{{page.title}}]({{page.url | relative_url}}) {{page.excerpt}}
   {% endif %}
 {% endfor %}
