@@ -39,6 +39,10 @@
 
 site url: {{site.url}}
 
+relative_url: {{relative_url}}
+
+absolute_url: {{absolute_url}}
+
 {% for page in site.html_pages %}
   {% if page.title != nil and page.dir contains "/cli-commands/" %}
 page url: {{page.url}}
