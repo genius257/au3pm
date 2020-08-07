@@ -51,6 +51,6 @@ page dir: {{page.dir}}
 
 page path: {{page.path}}
 
-* [{{page.title}}]({{page.url | relative_url}}) {{page.excerpt}}
+* [{{ page.title | downcase }}]({{ page.url | relative_url }}) {{ page.excerpt }}
   {% endif %}
 {% endfor %}
