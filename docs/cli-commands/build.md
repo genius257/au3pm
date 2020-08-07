@@ -1,3 +1,6 @@
+---
+excerpt: Build a package
+---
 # Build
 Build a package
 
