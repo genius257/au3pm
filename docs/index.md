@@ -1,21 +1,6 @@
 ## CLI documentation
 
-### CLI commands
-
-* [build](build.md) Build a package
-* [config](config.md) Manage the au3pm configuration files
-* [init](init.md) Create a au3pm.json file
-* [install](install.md) Install a package
-* [list](list.md) List installed packages
-* [rebuild](rebuild.md) Rebuild a package
-* [restart](restart.md) Restart a package
-* [run](run.md) Runs a defined package script
-* [start](start.md) Start a package
-* [stop](stop.md) Stop a package
-* [test](test.md) Test a package
-* [uninstall](uninstall.md) Remove a package
-* [update](update.md) Update a package
-* [version](version.md) Show au3pm version
+{% include_relative cli-commands/index.md %}
 
 ### Configuring au3pm
 
