@@ -19,23 +19,3 @@
 * [registry](registry.md) The AutoIt3 Package Registry
 * [removal](removal.md) Cleaning the Slate
 * [scripts](scripts.md) How au3pm handles the "scripts" field
-
-### TEST
-
-site url: {{site.url}}
-
-relative_url?: {{ '/' | relative_url}}
-
-absolute_url: {{ '/' | absolute_url }}
-
-{% for page in site.html_pages %}
-  {% if page.title != nil and page.dir contains "/cli-commands/" %}
-page url: {{page.url}}
-
-page dir: {{page.dir}}
-
-page path: {{page.path}}
-
-* [{{ page.title | downcase }}]({{ page.url | relative_url }}) {{ page.excerpt }}
-  {% endif %}
-{% endfor %}
