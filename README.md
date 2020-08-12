@@ -23,24 +23,6 @@ Simply download the executable from releases, or build it yourself (building it,
 3. Wait for the command to finish
 4. the command `au3pm` should now be available in the `cmd.exe`
 
+# Documentation
 
-# Usage
-
-syntax
-
-```
-au3pm [command] [args]
-```
-
-## install
-
-syntax
-
-```
-au3pm install [package][@version]
-```
-
-example
-```
-au3pm install json
-```
+The documentation is available [here](//genius257.github.io/au3pm/)
