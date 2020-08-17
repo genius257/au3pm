@@ -2,7 +2,7 @@
 A package manager for AutoIt3
 
 [![latest stable au3pm version](https://img.shields.io/github/v/release/genius257/au3pm?include_prereleases)](https://github.com/genius257/au3pm/releases/latest/)
-[![open issues](https://img.shields.io/github/issues-raw/genius257/au3pm)](https://github.com/genius257/au3mp/issues/)
+[![open issues](https://img.shields.io/github/issues-raw/genius257/au3pm)](https://github.com/genius257/au3pm/issues/)
 [![GitHub All Releases](https://img.shields.io/github/downloads/genius257/au3pm/total)](https://github.com/genius257/au3pm/releases/)
 ![AppVeyor tests](https://img.shields.io/appveyor/tests/genius257/au3pm)
 
