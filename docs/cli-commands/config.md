@@ -14,8 +14,6 @@ au3pm config list [-l] [--json]
 au3pm config edit
 au3pm get <key>
 au3pm set <key> <value> [-g|--global]
-
-aliases: c
 ```
 
 ### Description
