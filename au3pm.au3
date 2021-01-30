@@ -364,7 +364,7 @@ Func InstallPackage($url, $name, $bInstallDependencies = False)
     If FileExists(@WorkingDir & '\au3pm\'&$name&'\au3pm\') Then
         ConsoleWriteErrorLine('WARNING: au3pm dependency folder within dependency"'&$name&'" already exists! this may cause unexpected results!')
     Else
-        RunWait(StringFormat('%s %s %s', @ComSpec & " /c mklink /J", @WorkingDir & '\au3pm\'&$name&'\au3pm\', @WorkingDir & '\au3pm\'))
+        RunWait(StringFormat('%s "%s" "%s"', @ComSpec & " /c mklink /J", @WorkingDir & '\au3pm\'&$name&'\au3pm\', @WorkingDir & '\au3pm\'))
     EndIf
 
     If DirRemove($tmp, 1) <> 1 Then Return SetError(5)
