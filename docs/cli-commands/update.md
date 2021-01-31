@@ -7,7 +7,7 @@ Update a package
 ### Synopsis
 
 ```
-npm update [<name>]
+au3pm update [<name>]
 ```
 
 ### Description

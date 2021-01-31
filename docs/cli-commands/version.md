@@ -1,8 +1,8 @@
 ---
-excerpt: Print npm version
+excerpt: Print au3pm version
 ---
 # Version
-Print npm version
+Print au3pm version
 
 ### Synopsis
 
