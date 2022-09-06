@@ -275,8 +275,8 @@ Func fetchAutoIt($reference)
         For $j = 0 To UBound($aInnerText)-1 Step +1
             $sInnerText &= __HTMLParser_GetString(__doublyLinkedList_Node($aInnerText[$j]).data)
         Next
-        If StringRegExp($sInnerText, "(?i)^autoit") And (Not StringRegExp($sInnerText, "(?i)docs")) And StringRegExp($sInnerText, "(?i)\.zip$") Then
-            $aVersions[$iCount][0] = StringRegExp($sInnerText, "v(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 1)[0]
+        If StringRegExp($sInnerText, "(?i)^autoit") And (Not StringRegExp($sInnerText, "(?i)(docs|setup)")) And StringRegExp($sInnerText, "(?i)(\.zip|-sfx\.exe)$") Then
+            $aVersions[$iCount][0] = autoitVerToSemver($sInnerText); StringRegExp($sInnerText, "v(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 1)[0]
             $aVersions[$iCount][1] = "https://www.autoitscript.com/autoit3/files/archive/autoit/" & _HTMLParser_Element_GetAttribute("href", $versions[$i])
             $iCount += 1
         EndIf
