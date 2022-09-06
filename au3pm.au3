@@ -370,8 +370,16 @@ Func InstallPackage($url, $name, $bInstallDependencies = False)
 
     If FileExists(@WorkingDir & '\au3pm\'&$name&'\') Then DirRemove(@WorkingDir & '\au3pm\'&$name&'\', 1)
 
-    If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$name&'\') <> 1 Then
-        Return SetError(4)
+    Local $aFileList = _FileListToArray($tmp&'\out\', '*', 2, True)
+
+    If $aFileList[0] = 1 And isDirectory($aFileList[1]) Then
+        If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$name&'\') <> 1 Then
+            Return SetError(4)
+        EndIf
+    Else
+        If DirMove($tmp&'\out\', @WorkingDir & '\au3pm\'&$name&'\') <> 1 Then
+            Return SetError(4)
+        EndIf
     EndIf
 
     If FileExists(@WorkingDir & '\au3pm\'&$name&'\au3pm\') Then
