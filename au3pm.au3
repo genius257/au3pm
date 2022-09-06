@@ -258,6 +258,19 @@ Func getPackageDependencies($dependency, $range)
     ;TODO
 EndFunc
 
+Func autoit3VerToSemver($sVer)
+    Local $aFileVersionInfo = StringRegExp($sVer, "(?<major>[0-9]+)(?:\.(?<minor>[0-9]+))?(?:\.(?<build>[0-9]+))?(?:\.(?<private>[0-9]+))?", $STR_REGEXPARRAYMATCH)
+    Local $iLength = UBound($aFileVersionInfo)
+    If $iLength <> 4 Then
+        Redim $aFileVersionInfo[4]
+        For $i = 1 To 3
+            $aFileVersionInfo[$i] = StringIsDigit($aFileVersionInfo[$i]) ? $aFileVersionInfo[$i] : "0"
+        Next
+    EndIf
+
+    Return StringFormat("%u.%u.%u", $aFileVersionInfo[1], $aFileVersionInfo[2], $aFileVersionInfo[3])
+EndFunc
+
 #cs
 # fetch autoit with resolved reference.
 #
@@ -276,7 +289,7 @@ Func fetchAutoIt($reference)
             $sInnerText &= __HTMLParser_GetString(__doublyLinkedList_Node($aInnerText[$j]).data)
         Next
         If StringRegExp($sInnerText, "(?i)^autoit") And (Not StringRegExp($sInnerText, "(?i)(docs|setup)")) And StringRegExp($sInnerText, "(?i)(\.zip|-sfx\.exe)$") Then
-            $aVersions[$iCount][0] = autoitVerToSemver($sInnerText); StringRegExp($sInnerText, "v(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 1)[0]
+            $aVersions[$iCount][0] = autoit3VerToSemver($sInnerText); StringRegExp($sInnerText, "v(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 1)[0]
             $aVersions[$iCount][1] = "https://www.autoitscript.com/autoit3/files/archive/autoit/" & _HTMLParser_Element_GetAttribute("href", $versions[$i])
             $iCount += 1
         EndIf
