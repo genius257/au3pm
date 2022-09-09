@@ -537,6 +537,7 @@ Func json_stringify($json)
                     Return StringFormat('"[object %s]"', ObjName($json, 1))
             EndSwitch
         Case "String"
+            $json = StringRegExpReplace($json, '\\|"', '\\$0');JSON escape string chars
             $sJson = StringFormat('"%s"', $json)
         Case Else
             ConsoleWrite(VarGetType($json)&@CRLF)
