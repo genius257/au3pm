@@ -155,7 +155,17 @@ Func fetchPackage($name, $reference)
             $reference = fetchAu3pm($reference)
             If @error <> 0 Then Return SetError(@error)
         Case 'autoit'
+            ConsoleWrite('WARNING: au3pm dependency "autoit" is deprecated. please use "autoit3" instead to allow version ranges.'&@CRLF)
             $reference = fetchAutoIt($reference)
+            If @error <> 0 Then Return SetError(@error)
+        Case 'autoit1'
+            $reference = fetchAutoIt1($reference)
+            If @error <> 0 Then Return SetError(@error)
+        Case 'autoit2'
+            $reference = fetchAutoIt2($reference)
+            If @error <> 0 Then Return SetError(@error)
+        Case 'autoit3'
+            $reference = fetchAutoIt3($reference)
             If @error <> 0 Then Return SetError(@error)
     EndSwitch
 
@@ -277,9 +287,29 @@ EndFunc
 # fetch autoit with resolved reference.
 #
 # Getting AutoIt version with au3pm is a special case, so this function is made to handle this special case.
+# @deprecated
 #ce
 Func fetchAutoIt($reference)
-    If StringRegExp($reference, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", 0) And IsArray(__SemVer_ConditionParse(StringRegExpReplace($reference, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", "$1"))) Then $reference = StringRegExpReplace($reference, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", "$1")
+    If StringRegExp($reference, "^(>=)?[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$", $STR_REGEXPMATCH) = 0 Then Return SetError(1)
+    Local $result = fetchAutoIt3(StringRegExpReplace($reference, "^(>=)?[0-9]+\.", "$1", 1))
+    Return SetError(@error, @extended, $result)
+EndFunc
+
+Func fetchAutoIt1($reference)
+    Local Static $sVersion = "1.8"
+    If Not _SemVer_Satisfies($sVersion, $reference) Then Return SetError(1)
+    Local $return = ['autoit1', __SemVer_Parse($sVersion), "http://www.autoitscript.com/files/AutoIt/AutoIt_v1_8.zip"]
+    Return $return
+EndFunc
+
+Func fetchAutoIt2($reference)
+    Local Static $sVersion = "2.64"
+    If Not _SemVer_Satisfies($sVersion, $reference) Then Return SetError(1)
+    Local $return = ['autoit2', __SemVer_Parse($sVersion), "http://www.autoitscript.com/files/AutoIt/AutoIt.zip"]
+    Return $return
+EndFunc
+
+Func fetchAutoIt3($reference)
     Local $versions = _HTMLParser_GetElementsByTagName("a", _HTMLParser_GetFirstStartTag(_HTMLParser(BinaryToString(InetRead('https://www.autoitscript.com/autoit3/files/archive/autoit/', 3))).head))
     Local $iCount = 0
     Local $aVersions[UBound($versions, 1)][2]
