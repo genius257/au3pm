@@ -8,6 +8,8 @@
 #include "au3pm\semver\SemVer.au3"
 #include "au3pm\html\HTMLParser.au3"
 
+#include "misc\File.au3"
+
 FileInstall("7za.exe" , @ScriptDir & "\7za.exe")
 
 ;FIXME: support au3pm-lock.json
