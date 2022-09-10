@@ -33,7 +33,7 @@ If $CmdLine[0] = 1 Then
             $url = StringRegExp($info, '^([^/]+/.*?)(?:#(.*))?$', 1)
             ConsoleWriteLine('Github detected.')
             $url = StringFormat("https://github.com/%s/archive/%s.zip", $url[0], execute('$url[1]') ? $url[1] : 'master')
-        ElseIf IsArray(__SemVer_ConditionParse($info)) Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
+        ElseIf IsArray(__SemVer_ConditionParse($info)) Or StringLower($dependency) == 'autoit' Then ; https://github.com/semver/semver/issues/232#issuecomment-405596809
             ConsoleWriteLine('Semver detected. au3pm repository lookup...')
             $url = fetchPackage($dependency, $info)
         Else
