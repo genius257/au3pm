@@ -56,8 +56,10 @@ Else
     If StringRegExp($CmdLine[2], "^[[:alpha:][:digit:]\-\.\_\~]+$", 0) Then
         ConsoleWriteLine("assuming au3pm package")
         $url = fetchPackage($CmdLine[2], ($CmdLine[0] > 2 And Not $CmdLine[3] == "-g") ? $CmdLine[3] : "*")
-        $dependency = $CmdLine[2]
-        $version = $url[1]
+        If @error = 0 Then
+            $dependency = $CmdLine[2]
+            $version = $url[1]
+        EndIf
     ElseIf StringRegExp($CmdLine[2], "^[[:alpha:][:digit:]\-\.\_\~]+@[\s=v]*(\d+|x|\*)(\.(?:\d+|x|\*)|)(\.(?:\d+|x|\*)|)?\s*(\-[A-Za-z0-9\-\.]+|)\s*(\+[A-Za-z0-9\-\.]+|)\s*$", 0) Then ;FIXME: ranges such as ^3 currently not supported by the regex
         ConsoleWriteLine("assuming au3pm package with specifed semver rule")
         $aPackage = StringRegExp($CmdLine[2], "([^@]+)@([^@]+)", 1)
