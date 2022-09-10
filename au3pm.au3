@@ -292,6 +292,10 @@ EndFunc
 Func fetchAutoIt($reference)
     If StringRegExp($reference, "^(>=)?[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$", $STR_REGEXPMATCH) = 0 Then Return SetError(1)
     Local $result = fetchAutoIt3(StringRegExpReplace($reference, "^(>=)?[0-9]+\.", "$1", 1))
+    If @error=0 Then
+        $result[0] = 'autoit'
+        $result[1] = "3."&$result[1]
+    EndIf
     Return SetError(@error, @extended, $result)
 EndFunc
 
