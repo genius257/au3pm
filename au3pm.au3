@@ -328,7 +328,7 @@ Func fetchAutoIt3($reference)
     Next
     ReDim $aVersions[$iCount][2]
     ;TODO: get autoit versions (release and beta), resolve reference, download and extract autoit, inject special au3pm.json file into extracted content, return path to folder?
-    $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
+    Local $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
     For $i = 0 To UBound($aVersions, 1) - 1
         If $aVersions[$i][0] == $sVersion Then
             Local $return = ['autoit', $sVersion, $aVersions[$i][1]]
