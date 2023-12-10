@@ -8,7 +8,7 @@ A package manager for AutoIt3
 
 The syntax is inspired from package managers like `npm`, `yarn` and `composer`.
 
-[![Download executable](https://img.shields.io/github/v/release/genius257/au3pm?include_prereleases&style=for-the-badge&label=Click+Here+to+Download)](https://github.com/genius257/au3pm/releases/download/0.3.0/au3pm.exe)
+[![Download executable](https://img.shields.io/github/v/release/genius257/au3pm?include_prereleases&style=for-the-badge&label=Click+Here+to+Download)](https://github.com/genius257/au3pm/releases/download/0.3.1/au3pm.exe)
 
 
 # Installation
