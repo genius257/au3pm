@@ -519,7 +519,8 @@ Func json_stringify($json)
                 Case Default
                     $sJson = '""'
                 Case Else
-                    ContinueCase 2
+                    ConsoleWriteErrorLine(StringFormat("json_stringify: Unexpected keyword: %s", $json))
+                    Exit 1
             EndSwitch
         Case "Object"
             Switch ObjName($json, 6)
