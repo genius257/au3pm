@@ -545,8 +545,8 @@ Func json_stringify($json)
             $json = StringRegExpReplace($json, '\\|"', '\\$0');JSON escape string chars
             $sJson = StringFormat('"%s"', $json)
         Case Else
-            ConsoleWrite(VarGetType($json)&@CRLF)
-            Exit MsgBox(0, "", VarGetType($json))
+            ConsoleWriteErrorLine(StringFormat("json_stringify: Unexpected var type: %s", VarGetType($json)))
+            Exit 1
     EndSwitch
     Return $sJson
 EndFunc
