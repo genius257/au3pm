@@ -1,3 +1,20 @@
+#include-once
+
+#include "../lib/config.au3"
+#include "../lib/package.au3"
+
+Func Command_Install($sPackage)
+    ;load lock or package file
+    
+    if $sPackage = Null Then
+        ; if no lock file is available, resolve package hashes and generate lock file
+
+        Return SetError(@error, @extended, 1);
+    EndIf
+EndFunc
+
+#cs
+
 If $CmdLine[0] = 1 Then
     ;; FIXME: use au3pm-lock file, instead if available!
     If Not FileExists(@WorkingDir & '\au3pm.json') Then
@@ -161,3 +178,5 @@ Else
 
     Exit 0
 EndIf
+
+#ce
