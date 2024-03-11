@@ -15,4 +15,4 @@ IF NOT EXIST "%~dp0\build\" (MD "%~dp0\build\")
 CD "%~dp0\build\"
 
 REM https://stackoverflow.com/a/54252275
-"%AutoItDir%\AutoIt3.exe" "%~dp0\au3pm.au3" %* 2>&1|more
+"%AutoItDir%\AutoIt3.exe" "%~dp0\src\au3pm.au3" %* 2>&1|more

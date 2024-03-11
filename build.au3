@@ -54,7 +54,3 @@ _WinAPI_EndUpdateResource($hUpdate, False)
 
 _memGlobalUnLock($pData2)
 _memGlobalFree($hData2)
-
-Exit
-
-#include "au3pm.au3"

@@ -14,6 +14,6 @@ IF NOT EXIST "%~dp0\build\" (MD "%~dp0\build\")
 
 IF EXIST "%~dp0\build\au3pm.exe" (DEL "%~dp0\build\au3pm.exe")
 
-"%AutoItDir%\Aut2Exe\Aut2exe.exe" /in "%~dp0\au3pm.au3" /out "%~dp0\build\au3pm.exe" /icon "%~dp0\au3pm.ico" /x86 /console
+"%AutoItDir%\Aut2Exe\Aut2exe.exe" /in "%~dp0\src\au3pm.au3" /out "%~dp0\build\au3pm.exe" /icon "%~dp0\au3pm.ico" /x86 /console
 
-"%AutoItDir%\AutoIt3.exe" "%~dp0\build.au3" "%~dp0\build\au3pm.exe" "%~dp0\au3pm.json"
+"%AutoItDir%\AutoIt3.exe" "%~dp0\src\build.au3" "%~dp0\build\au3pm.exe" "%~dp0\au3pm.json"
