@@ -60,7 +60,7 @@ Func fetchAutoIt3($reference)
 EndFunc
 
 Func fetchAu3pm($reference)
-    Local $versions = json_parse(json_lex(BinaryToString(InetRead('https://api.github.com/repos/genius257/au3pm/releases'))))[0]
+    Local $versions = _json_decode(BinaryToString(InetRead('https://api.github.com/repos/genius257/au3pm/releases')))
     Local $aVersions[UBound($versions)][2]
     Local $i
     For $i = 0 To UBound($versions)-1

@@ -26,9 +26,9 @@ Func fetchPackage($name, $reference)
     EndSwitch
 
     If __SemVer_ConditionParse($reference) Or @error=0 Then; _SemVer_Valid($reference) Then
-        Local Static $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
+        Local Static $directory = _json_decode(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS)))
         Local $pathName = $directory.Item($name)
-        Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $name, "au3pm.json"), $INET_FORCEBYPASS))))[0]
+        Local $packageDirectory = _json_decode(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $name, "au3pm.json"), $INET_FORCEBYPASS)))
         Local $versions = $packageDirectory.Item('versions').keys()
         Local $maxSatisfying = _semver_MaxSatisfying($versions, $reference)
         Local $sha = $packageDirectory.Item('versions').Item($maxSatisfying)
@@ -45,7 +45,7 @@ Func fetchPackage($name, $reference)
 EndFunc
 
 Func getPackageDependencyTree($dependencies)
-    Local Static $directory = json_parse(json_lex(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS))))[0]
+    Local Static $directory = _json_decode(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS)))
     Local $resolvedDependencies = ObjCreate("Scripting.Dictionary")
     Local $queue = ObjCreate("System.Collections.ArrayList")
     $queue.Add($dependencies)
@@ -61,7 +61,7 @@ Func getPackageDependencyTree($dependencies)
             Local $package = fetchPackage($keyEntry, $range)
             Local $maxSatisfying = $package[1]
             #cs
-            Local $packageDirectory = json_parse(json_lex(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $keyEntry, "au3pm.json"), $INET_FORCEBYPASS))))[0]
+            Local $packageDirectory = _json_decode(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $keyEntry, "au3pm.json"), $INET_FORCEBYPASS)))
             Local $range = $entry.Item($keyEntry)
             Local $versions = $packageDirectory.Item('versions').keys
             Local $maxSatisfying = _SemVer_MaxSatisfying($versions, $range)

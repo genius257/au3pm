@@ -23,7 +23,7 @@ If $CmdLine[0] = 1 Then
     EndIf
 
     $json = FileRead(@WorkingDir & '\au3pm.json')
-    $json = json_parse(json_lex($json))[0]
+    $json = _json_decode($json)
     If @error <> 0 Then
         ConsoleWriteLine('problem occured when reading au3pm.json')
         Exit 1
@@ -134,7 +134,7 @@ Else
     $originalVersion = $url[1]
     $originalUrl = $url[2]
 
-    $dependencies = json_parse(json_lex('{}'))[0]
+    $dependencies = _json_decode('{}')
     $dependencies.Add($dependency, $url[1])
     $resolvedDependencies = getPackageDependencyTree($dependencies)
     ;ConsoleWriteLine(json_stringify($resolvedDependencies))

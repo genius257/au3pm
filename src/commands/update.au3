@@ -57,7 +57,7 @@ Func Command_Update($sPackage = Null)
         Return SetError(1)
     EndIf
     $version = $dependencies.Item($dependency)
-    $dependencies = json_parse(json_lex('{}'))[0]
+    $dependencies = _json_decode('{}')
     $dependencies.Add($dependency, $version)
 
     $resolvedDependencies = getPackageDependencyTree($dependencies)
