@@ -1,4 +1,6 @@
 #include-once
+#include <File.au3>
+#include "file.au3"
 
 If Not IsDeclared('registry') Then Global Const $registry = "https://raw.githubusercontent.com/au3pm/action-test/master/"
 
