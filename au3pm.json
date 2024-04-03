@@ -7,8 +7,9 @@
   "dependencies": {
     "autoit": ">=3.3.14.4",
     "html": "^1.0.0",
-    "json": "^1.0.0",
-    "semver": "^1.0.0"
+    "json": "^2.0.0",
+    "semver": "^1.0.0",
+    "github:genius257/au3-md5": "dev-main"
   },
   "scripts": {
     "build": "build.bat"
