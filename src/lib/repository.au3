@@ -1,4 +1,6 @@
 #include-once
+#include "../../au3pm/html/HTMLParser.au3"
+#include "semver.au3"
 
 #cs
 # fetch autoit with resolved reference.
