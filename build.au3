@@ -6,6 +6,8 @@
 #include "au3pm\semver\SemVer.au3"
 #include "au3pm\html\HTMLParser.au3"
 
+#include "src/lib/config.au3"
+
 If $CmdLine[0] <= 1 Or Not FileExists($CmdLine[1]) Or Not FileExists($CmdLine[2]) Then Exit 1
 
 $hInstance = _WinAPI_LoadLibraryEx($CmdLine[1], $LOAD_LIBRARY_AS_DATAFILE)

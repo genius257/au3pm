@@ -10,10 +10,22 @@ IF BitVersion == 32 (set AutoItReg="HKEY_LOCAL_MACHINE\Software\AutoIt v3") ELSE
 
 FOR /F "skip=2 tokens=2,*" %%A IN ('reg query "%AutoItReg:"=%\AutoIt" /v "InstallDir"') DO set "AutoItDir=%%B"
 
-IF NOT EXIST "%~dp0\build\" (MD "%~dp0\build\")
+ECHO Using AutoIt3 directory: "%AutoItDir%"
 
-IF EXIST "%~dp0\build\au3pm.exe" (DEL "%~dp0\build\au3pm.exe")
+IF NOT EXIST "%~dp0\build\" (
+    ECHO Creating missing build folder
+    MD "%~dp0\build\"
+)
 
-"%AutoItDir%\Aut2Exe\Aut2exe.exe" /in "%~dp0\src\au3pm.au3" /out "%~dp0\build\au3pm.exe" /icon "%~dp0\au3pm.ico" /x86 /console
+IF EXIST "%~dp0\build\au3pm.exe" (
+    ECHO Removing previous executable
+    DEL "%~dp0\build\au3pm.exe"
+)
 
-"%AutoItDir%\AutoIt3.exe" "%~dp0\src\build.au3" "%~dp0\build\au3pm.exe" "%~dp0\au3pm.json"
+ECHO Building executable
+
+"%AutoItDir%\Aut2Exe\Aut2exe.exe" /in "%~dp0\src\main.au3" /out "%~dp0\build\au3pm.exe" /icon "%~dp0\au3pm.ico" /x86 /console
+
+ECHO Running post processing for new executable
+
+"%AutoItDir%\AutoIt3.exe" "%~dp0\build.au3" "%~dp0\build\au3pm.exe" "%~dp0\au3pm.json"
