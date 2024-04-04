@@ -30,7 +30,7 @@ Func Command_Init()
 
     Local $hFile
     If Not FileExists(@WorkingDir&"\"&$main) Then
-        $hFile = FileOpen(@WorkingDir&"\"&$main, 2)
+        $hFile = FileOpen(@WorkingDir&"\"&$main, $FO_OVERWRITE)
         If @error <> 0 Then
             ConsoleWriteLine(StringFormat('ERROR: failed creating file "%s"', @WorkingDir&"\"&$main))
             Return SetError(1)
@@ -38,7 +38,7 @@ Func Command_Init()
         FileClose($hFile)
     EndIf
 
-    $hFile = FileOpen($packagePath, 2 + 128)
+    $hFile = FileOpen($packagePath, $FO_OVERWRITE + $FO_UTF8)
     If @error <> 0 Then
         ConsoleWriteLine(StringFormat('ERROR: failed creating file "%s"', $packagePath))
         Return SetError(1)
