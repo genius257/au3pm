@@ -1,4 +1,7 @@
 #include-once
+#include <FileConstants.au3>
+#include <WinAPIProc.au3>
+#include "../lib/console.au3"
 
 Func Command_Init()
     Local $packagePath = StringFormat("%s\au3pm.json", @WorkingDir)
