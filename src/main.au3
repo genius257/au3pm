@@ -5,6 +5,8 @@ FileInstall("../assets/7za.exe" , @ScriptDir & "\7za.exe")
 Global Const $__au3pm_json_path = @WorkingDir & "\au3pm.json"
 Global Const $__au3pm_lock_path = @WorkingDir & "\au3pm-lock.json"
 
+#include "./lib/string.au3"
+
 #include "./commands/build.au3"
 #include "./commands/config.au3"
 #include "./commands/init.au3"
@@ -19,6 +21,8 @@ Global Const $__au3pm_lock_path = @WorkingDir & "\au3pm-lock.json"
 #include "./commands/uninstall.au3"
 #include "./commands/update.au3"
 #include "./commands/version.au3"
+
+Global $commands = ['build', 'config', 'init', 'install', 'list', 'rebuild', 'restart', 'run', 'start', 'stop', 'test', 'uninstall', 'update', 'version']
 
 HttpSetUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0')
 
@@ -69,6 +73,21 @@ Switch StringLower($command)
         Command_Update($package)
     Case 'version'
         Command_Version()
+    Case Else
+        ConsoleWriteLine(StringFormat('The command %s is not supported.', $command))
+        Local $match
+        Local $p, $q
+        $p = levenshtein($command, $commands[0])
+        $match = $commands[0]
+        For $c In $commands
+            $q = levenshtein($command, $c)
+            If $q < $p Then
+                $match = $c
+                $p = $q
+            EndIf
+        Next
+        ConsoleWriteLine(@CRLF&"Did you mean: "&$match)
+        SetError(1)
 EndSwitch
 
 ;Exit with error code from the command result
