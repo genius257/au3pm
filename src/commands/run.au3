@@ -18,12 +18,12 @@ Func Command_Run($sName = Null)
         Return SetError(0)
     EndIf
 
-    If Not $json.Item('scripts').Exists($name) Then
-        ConsoleWriteErrorLine(StringFormat('script "%s" does not exist', $name))
+    If Not MapExists($json['scripts'], $sName) Then
+        ConsoleWriteErrorLine(StringFormat('script "%s" does not exist', $sName))
         Return SetError(0)
     EndIf
 
-    Local $command = $json.Item('scripts').Item($name)
+    Local $command = $json['scripts'][$sName]
 
     Return RunWait(@ComSpec & " /c " & $command)
 EndFunc
