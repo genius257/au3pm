@@ -1,9 +1,13 @@
+#include-once
+#include "../lib/console.au3"
+#include "../../au3pm/semver/SemVer.au3"
+
 $json = au3pm_json_load()
 $lock = au3pm_lock_load()
 
 Func Command_Update($sPackage = Null)
     If $sPackage = Null Then
-        $dependencies = $json.Item('dependencies')
+        $dependencies = $json['dependencies']
         If @error <> 0 Then
             ConsoleWriteLine('no dependencies found in au3pm.json')
             Return SetError(0)
@@ -15,14 +19,14 @@ Func Command_Update($sPackage = Null)
         ;FIXME: add function to download and install package
 
         For $dependency In $dependencies
-            If _SemVer_Gte($lock.Item("packages").Item($dependency), $dependencies.Item($dependency)) Then
+            If _SemVer_Gte($lock["packages"][$dependency], $dependencies[$dependency]) Then
                 ConsoleWriteLine(StringFormat("[%s] old >= new, no upgrade needed", $dependency))
                 ContinueLoop
             ;Else
                 ;ConsoleWriteLine(StringFormat('[%s] should be upgraded', $dependency))
                 ;ContinueLoop
             EndIf
-            $info = $dependencies.Item($dependency)
+            $info = $dependencies[$dependency]
             If StringRegExp($info, '^([^/]+/.*)(?:#(.*))$') Then
                 $url = StringRegExp($info, '^([^/]+/.*?)(?:#(.*))?$', 1)
                 ConsoleWriteLine('Github detected.')
@@ -41,8 +45,8 @@ Func Command_Update($sPackage = Null)
                 ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
                 Return SetError(1)
             EndIf
-            If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
-            $lock.Item("packages").Add($dependency, $url[1])
+            If MapExists($lock["packages"], $dependency) Then MapRemove($lock["packages"], $dependency)
+            $lock["packages"][$dependency] = $url[1]
         Next
 
         au3pm_lock_save($lock)
@@ -51,24 +55,24 @@ Func Command_Update($sPackage = Null)
 
     $dependency = $CmdLine[2]
 
-    $dependencies = $json.Item('dependencies')
+    $dependencies = $json['dependencies']
     if Not $dependencies.Exists($dependency) Then
         ConsoleWriteErrorLine(StringFormat('dedpendency "%s" not found in au3pm.json', $dependency))
         Return SetError(1)
     EndIf
-    $version = $dependencies.Item($dependency)
+    $version = $dependencies[$dependency]
     $dependencies = _json_decode('{}')
-    $dependencies.Add($dependency, $version)
+    $dependencies[$dependency] = $version
 
     $resolvedDependencies = getPackageDependencyTree($dependencies)
     $dependencies = $resolvedDependencies
 
     For $dependency In $dependencies
-        If _SemVer_Gte($lock.Item("packages").Item($dependency), $dependencies.Item($dependency)) Then
+        If _SemVer_Gte($lock["packages"][$dependency], $dependencies[$dependency]) Then
             ConsoleWriteLine(StringFormat("[%s] old >= new, no upgrade needed", $dependency))
             ContinueLoop
         EndIf
-        $info = $dependencies.Item($dependency)
+        $info = $dependencies[$dependency]
         If StringRegExp($info, '^([^/]+/.*)(?:#(.*))$') Then
             $url = StringRegExp($info, '^([^/]+/.*?)(?:#(.*))?$', 1)
             ConsoleWriteLine('Github detected.')
@@ -87,8 +91,8 @@ Func Command_Update($sPackage = Null)
             ConsoleWriteErrorLine(StringFormat("Error occured while installing %s", $dependency))
             Return SetError(1)
         EndIf
-        If $lock.Item("packages").Exists($dependency) Then $lock.Item("packages").Remove($dependency)
-        $lock.Item("packages").Add($dependency, $url[1])
+        If MapExists($lock["packages"], $dependency) Then MapRemove($lock["packages"], $dependency)
+        $lock["packages"][$dependency] = $url[1]
     Next
 
     au3pm_lock_save($lock)
