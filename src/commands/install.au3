@@ -1,16 +1,98 @@
 #include-once
 
+#include <AutoItConstants.au3>
 #include "../lib/config.au3"
 #include "../lib/package.au3"
+#include "../lib/console.au3"
+#include "../../au3pm/au3-md5/md5.au3"
 
-Func Command_Install($sPackage)
-    ;load lock or package file
-    
+Func Command_Install($sPackage = Null)
+    Local $config = au3pm_config_load()
+    Local $config_source = @extended
+
     if $sPackage = Null Then
         ; if no lock file is available, resolve package hashes and generate lock file
 
+        Switch $config_source
+            Case $_au3pm_config_lockFile
+                ConsoleWrite('Checking lock file hash...'&@CRLF)
+                $expected_hash = $config.hash
+                $actual_hash = md5(_json_encode($config.packages))
+                If Not ($expected_hash == $actual_hash) Then
+                    ConsoleWrite("Hash mismatch: " & '"' & $expected_hash & '"' & " != " & '"' & $actual_hash & '"' & @CRLF)
+                    ConsoleWrite('Generating new lock file...'&@CRLF)
+                    ContinueCase
+                EndIf
+
+                ConsoleWriteLine('Clearing dependency folder'&@CRLF)
+                DirRemove(@WorkingDir & '\au3pm\', $DIR_REMOVE)
+                DirCreate(@WorkingDir & '\au3pm\')
+
+                For $oPackage In $config.packages
+                    Switch $oPackage.type
+                        Case 'github'
+                            $url = $oPackage.url & 'archive/' & $oPackage.reference & '.zip'
+                            ConsoleWrite('Installing package: ' & $oPackage.name & @CRLF)
+                            InstallPackage($url, $oPackage.name)
+                        Case 'simple'
+                            $url = $oPackage.url
+                            ConsoleWrite('Installing package: ' & $oPackage.name & @CRLF)
+                            InstallPackage($url, $oPackage.name)
+                        Case Else
+                            ConsoleWriteLine(StringFormat('Unsupported package type: %s \n', $oPackage.type))
+                            Return SetError(1, 0, 1)
+                    EndSwitch
+                Next
+            Case $_au3pm_config_configFile
+                If $config_source = $_au3pm_config_configFile Then
+                    ConsoleWriteLine('No au3pm-lock.json found.'&@CRLF)
+                Else
+                    $config = au3pm_json_load()
+                    If @error <> 0 Then
+                        ContinueCase
+                    EndIf
+                EndIf
+                ConsoleWriteLine('Resolving dependencies...'&@CRLF)
+                Local $lock_config[UBound($config.dependencies) + UBound($config.devDependencies)]
+                ;Local $dependencies_array = [$config.dependencies, $config.devDependencies]
+
+                ; Combine dependencies and devDependencies
+                Local $dependencies = $config.dependencies
+                If MapExists($config, 'devDependencies') Then
+                    Redim $dependencies[UBound($dependencies) + UBound($config.devDependencies)]
+                    For $i = 0 To UBound($config.devDependencies)
+                        $dependencies[UBound($dependencies) + $i] = $config.devDependencies[$i]
+                    Next
+                EndIf
+
+                $resolvedDependencies = getPackageDependencyTree($dependencies)
+
+                ConsoleWriteLine('Clearing dependency folder'&@CRLF)
+                DirRemove(@WorkingDir & '\au3pm\', $DIR_REMOVE)
+                DirCreate(@WorkingDir & '\au3pm\')
+
+                For $dependencies In $dependencies_array
+                    If $dependencies = Null Then ContinueLoop
+                    For $dependency In MapKeys($dependencies)
+                        ConsoleWrite($dependency&@CRLF)
+                        ;$lock_config.Add($dependency, $dependencies.Item($dependency))
+                        ;ConsoleWrite('Installing package: ' & $package.name & @CRLF)
+                    Next
+                Next
+            Case $_au3pm_config_noFile
+                ConsoleWriteLine('No au3pm.json or au3pm-lock.json found. Please run "au3pm init" first.')
+                Return SetError(1, 0, 1)
+            Case Else
+                ConsoleWriteLine(StringFormat('Unexpected config source: %s \n', $config_source))
+                Return SetError(1, 0, 1)
+        EndSwitch
+
         Return SetError(@error, @extended, 1);
     EndIf
+
+    ;$dependencies = 
+
+    ConsoleWriteLine($sPackage)
 EndFunc
 
 #cs
