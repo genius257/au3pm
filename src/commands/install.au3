@@ -1,12 +1,13 @@
 #include-once
 
 #include <AutoItConstants.au3>
+#include <Crypt.au3>
 #include "../lib/config.au3"
 #include "../lib/package.au3"
 #include "../lib/console.au3"
 #include "../../au3pm/au3-md5/md5.au3"
 
-Func Command_Install($sPackage = Null)
+Func Command_Install($sPackage = Null, $sAlias = Null)
     Local $config = au3pm_config_load()
     Local $config_source = @extended
 
@@ -19,7 +20,7 @@ Func Command_Install($sPackage = Null)
                 $expected_hash = $config.hash
                 $actual_hash = md5(_json_encode($config.packages))
                 If Not ($expected_hash == $actual_hash) Then
-                    ConsoleWrite("Hash mismatch: " & '"' & $expected_hash & '"' & " != " & '"' & $actual_hash & '"' & @CRLF)
+                    ConsoleWrite("Lockfile content hash mismatch: " & '"' & $expected_hash & '"' & " != " & '"' & $actual_hash & '"' & @CRLF)
                     ConsoleWrite('Generating new lock file...'&@CRLF)
                     ContinueCase
                 EndIf
@@ -29,19 +30,11 @@ Func Command_Install($sPackage = Null)
                 DirCreate(@WorkingDir & '\au3pm\')
 
                 For $oPackage In $config.packages
-                    Switch $oPackage.type
-                        Case 'github'
-                            $url = $oPackage.url & 'archive/' & $oPackage.reference & '.zip'
-                            ConsoleWrite('Installing package: ' & $oPackage.name & @CRLF)
-                            InstallPackage($url, $oPackage.name)
-                        Case 'simple'
-                            $url = $oPackage.url
-                            ConsoleWrite('Installing package: ' & $oPackage.name & @CRLF)
-                            InstallPackage($url, $oPackage.name)
-                        Case Else
-                            ConsoleWriteLine(StringFormat('Unsupported package type: %s \n', $oPackage.type))
-                            Return SetError(1, 0, 1)
-                    EndSwitch
+                    InstallPackage($oPackage.url, $oPackage.name, False, $oPackage.integrity)
+                    If @error <> 0 Then
+                        ConsoleWrite(StringFormat("Package ""%s"" failed to install.\n", $oPackage.name))
+                        Return SetError(1)
+                    EndIf
                 Next
             Case $_au3pm_config_configFile
                 If $config_source = $_au3pm_config_configFile Then
@@ -53,8 +46,6 @@ Func Command_Install($sPackage = Null)
                     EndIf
                 EndIf
                 ConsoleWriteLine('Resolving dependencies...'&@CRLF)
-                Local $lock_config[UBound($config.dependencies) + UBound($config.devDependencies)]
-                ;Local $dependencies_array = [$config.dependencies, $config.devDependencies]
 
                 ; Combine dependencies and devDependencies
                 Local $dependencies = $config.dependencies
@@ -66,19 +57,36 @@ Func Command_Install($sPackage = Null)
                 EndIf
 
                 $resolvedDependencies = getPackageDependencyTree($dependencies)
+                If @error <> 0 Then
+                    ConsoleWrite("Failed resolving package dependency tree"&@CRLF)
+                    Return SetError(1, 0, 1)
+                EndIf
+                Local $lock_config[UBound($resolvedDependencies)]
+                ConsoleWrite(_json_encode_pretty($resolvedDependencies)&@CRLF)
 
                 ConsoleWriteLine('Clearing dependency folder'&@CRLF)
                 DirRemove(@WorkingDir & '\au3pm\', $DIR_REMOVE)
                 DirCreate(@WorkingDir & '\au3pm\')
 
-                For $dependencies In $dependencies_array
-                    If $dependencies = Null Then ContinueLoop
-                    For $dependency In MapKeys($dependencies)
-                        ConsoleWrite($dependency&@CRLF)
-                        ;$lock_config.Add($dependency, $dependencies.Item($dependency))
-                        ;ConsoleWrite('Installing package: ' & $package.name & @CRLF)
-                    Next
+                Local $iCount = 0
+                For $dependency In MapKeys($resolvedDependencies)
+                    Local $sIntegrity = InstallPackage($resolvedDependencies[$dependency]['url'], $dependency)
+
+                    If @error <> 0 Then
+                        ConsoleWrite("Installation of package failed: "&$dependency&@CRLF)
+                    EndIf
+                    Local $lock_config_entry[]
+                    $lock_config_entry['name'] = $dependency
+                    $lock_config_entry['url'] = $resolvedDependencies[$dependency]['url']
+                    $lock_config_entry['integrity'] = $sIntegrity
+                    $lock_config[$iCount] = $lock_config_entry
+                    $iCount += 1
                 Next
+                Local $lock_config_object[]
+                $lock_config_object['hash'] = md5(_json_encode($lock_config))
+                $lock_config_object['packages'] = $lock_config
+
+                au3pm_lock_save($lock_config_object)
             Case $_au3pm_config_noFile
                 ConsoleWriteLine('No au3pm.json or au3pm-lock.json found. Please run "au3pm init" first.')
                 Return SetError(1, 0, 1)
@@ -89,6 +97,8 @@ Func Command_Install($sPackage = Null)
 
         Return SetError(@error, @extended, 1);
     EndIf
+
+    ; Specific package should be installed
 
     ;$dependencies = 
 

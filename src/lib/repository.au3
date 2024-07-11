@@ -12,8 +12,8 @@ Func fetchAutoIt($reference)
     If StringRegExp($reference, "^(>=)?[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$", $STR_REGEXPMATCH) = 0 Then Return SetError(1)
     Local $result = fetchAutoIt3(StringRegExpReplace($reference, "^(>=)?[0-9]+\.", "$1", 1))
     If @error=0 Then
-        $result[0] = 'autoit'
-        $result[1] = "3."&$result[1]
+        $result['name'] = 'autoit'
+        $result['reference'] = "3."&$result['reference']
     EndIf
     Return SetError(@error, @extended, $result)
 EndFunc
@@ -21,14 +21,20 @@ EndFunc
 Func fetchAutoIt1($reference)
     Local Static $sVersion = "1.8"
     If Not _SemVer_Satisfies($sVersion, $reference) Then Return SetError(1)
-    Local $return = ['autoit1', __SemVer_Parse($sVersion), "http://www.autoitscript.com/files/AutoIt/AutoIt_v1_8.zip"]
+    Local $return[]
+    $return['name'] = 'autoit1'
+    $return['reference'] = __SemVer_Parse($sVersion)
+    $return['url'] = "http://www.autoitscript.com/files/AutoIt/AutoIt_v1_8.zip"
     Return $return
 EndFunc
 
 Func fetchAutoIt2($reference)
     Local Static $sVersion = "2.64"
     If Not _SemVer_Satisfies($sVersion, $reference) Then Return SetError(1)
-    Local $return = ['autoit2', __SemVer_Parse($sVersion), "http://www.autoitscript.com/files/AutoIt/AutoIt.zip"]
+    Local $return[]
+    $return['name'] = 'autoit2'
+    $return['reference'] = $sVersion
+    $return['url'] = "http://www.autoitscript.com/files/AutoIt/AutoIt.zip"
     Return $return
 EndFunc
 
@@ -54,7 +60,10 @@ Func fetchAutoIt3($reference)
     Local $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
     For $i = 0 To UBound($aVersions, 1) - 1
         If $aVersions[$i][0] == $sVersion Then
-            Local $return = ['autoit3', $sVersion, $aVersions[$i][1]]
+            Local $return[]
+            $return['name'] = 'autoit3'
+            $return['reference'] = $sVersion
+            $return['url'] = $aVersions[$i][1]
             Return $return
         EndIf
     Next

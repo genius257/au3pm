@@ -54,12 +54,14 @@ Func au3pm_lock_load($sFile = $__au3pm_lock_path)
     Return _json_decode($sJson)
 EndFunc
 
-Func au3pm_lock_save($json)
+Func au3pm_lock_save($json, $sDirectory = @WorkingDir)
+    $sDirectory = StringRegExpReplace($sDirectory, "(\/)*$", "/")
+
     If Not IsString($json) Then
-        $json = json_stringify($json)
+        $json = _json_encode_pretty($json)
     EndIf
 
-    Local $hFile = FileOpen($__au3pm_lock_path, 2)
+    Local $hFile = FileOpen($sDirectory&"au3pm-lock.json", 2)
     FileWrite($hFile, $json)
     FileClose($hFile)
 EndFunc
