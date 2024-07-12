@@ -81,7 +81,10 @@ Func fetchAu3pm($reference)
     Local $sVersion = _SemVer_MaxSatisfying(_ArrayExtract($aVersions, 0, -1, 0, 0), $reference)
     For $i = 0 To UBound($aVersions, 1) - 1
         If $aVersions[$i][0] == $sVersion Then
-            Local $return = ['au3pm', $sVersion, $aVersions[$i][1]]
+            Local $return[]
+            $return['name'] = 'au3pm'
+            $return['reference'] = $sVersion
+            $return['url'] = $aVersions[$i][1]
             Return $return
         EndIf
     Next
