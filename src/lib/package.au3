@@ -9,76 +9,124 @@
 #include "../../au3pm/au3json/json.au3"
 #include "../../au3pm/semver/SemVer.au3"
 #include "github.au3"
+#include "path.au3"
 
 If Not IsDeclared('registry') Then Global Const $registry = "https://raw.githubusercontent.com/au3pm/action-test/master/"
 
 Func fetchPackage($name, $reference)
     ; In a pure JS fashion, if it looks like a path, it must be a path.
-    If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference)
+    If StringRegExp($reference, "^(/|\./|\.\./)", 0) Then Return FileRead($reference); TODO: this may need to be removed
 
-    $protocol = StringRegExp($name, "^([a-zA-Z+-9]+):(.*)", $STR_REGEXPARRAYMATCH)
-    If @error = 0 Then
-        Switch $protocol[0]
-            Case 'github'
-                __SemVer_ConditionParse($reference)
-                If @error = 0 Then
-                    $tags = _GitHub_GetTags(StringLeft($protocol[1], StringInStr($protocol[1], "/") - 1), StringMid($protocol[1], StringInStr($protocol[1], "/") + 1))
-                    If @error <> 0 Then Return ConsoleWrite("ERROR: "&@error&@CRLF)
-                    Local $versions = MapKeys($tags)
-                    Local $maxSatisfying = _semver_MaxSatisfying($versions, $reference)
-                    Local $return[]
-                    $return['name'] = $protocol[1]
-                    $return['reference'] = $reference
-                    $return['url'] = $tags[$maxSatisfying].zipball_url
-                    Return $return
-                EndIf
-                Local $return[]
-                $return['name'] = $protocol[1]
-                $return['reference'] = $reference
-                $return['url'] = StringFormat('https://github.com/%s/archive/%s.zip', $protocol[1], $reference)
-                ;Local $return = [$name, $reference, StringFormat('https://github.com/%s/archive/%s.zip', $protocol[1], $reference)]
-                Return $return
-            Case Else
-                Return SetError(1, 0, StringFormat('Unsupported protocol: "%s" for dependency "%s"', $protocol[0], $protocol[1]))
-        EndSwitch
+    If Not ValidatePackageName($name) Then
+        ConsoleWriteError('Invalid package name: "' & $name & '"' & @CRLF)
+        Return SetError(1)
     EndIf
 
-    Switch StringLower($name)
+    ; Special cases, hard-coded dependencies
+    Switch $name
         Case 'au3pm'
             $reference = fetchAu3pm($reference)
             If @error <> 0 Then Return SetError(@error)
+            Return $reference
         Case 'autoit'
             ConsoleWrite('WARNING: au3pm dependency "autoit" is deprecated. please use "autoit3" instead to allow version ranges.'&@CRLF)
             $reference = fetchAutoIt($reference)
             If @error <> 0 Then Return SetError(@error)
+            Return $reference
         Case 'autoit1'
             $reference = fetchAutoIt1($reference)
             If @error <> 0 Then Return SetError(@error)
+            Return $reference
         Case 'autoit2'
             $reference = fetchAutoIt2($reference)
             If @error <> 0 Then Return SetError(@error)
+            Return $reference
         Case 'autoit3'
             $reference = fetchAutoIt3($reference)
             If @error <> 0 Then Return SetError(@error)
+            Return $reference
     EndSwitch
 
-    If __SemVer_ConditionParse($reference) Or @error=0 Then; _SemVer_Valid($reference) Then
-        Local Static $directory = _json_decode(BinaryToString(InetRead($registry & "au3pm.json", $INET_FORCEBYPASS)))
-        Local $pathName = $directory[$name]
-        Local $sJson = StringStripWS(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $name, "au3pm.json"), $INET_FORCEBYPASS)), BitOR($STR_STRIPLEADING, $STR_STRIPTRAILING))
-        Local $packageDirectory = _json_decode($sJson)
-        Local $versions = MapKeys($packageDirectory['versions'])
-        Local $maxSatisfying = _semver_MaxSatisfying($versions, $reference)
-        Local $sha = $packageDirectory['versions'][$maxSatisfying]
-        Local $repo = $packageDirectory['repo']
-        Local $return[]
-        $return['name'] = $name
-        $return['reference'] = $maxSatisfying
-        $return['url'] = fetchPackage($name, StringFormat('https://github.com/%s/archive/%s.zip', $repo, $sha))
-        Return $return
-    EndIf
+    Select
+        Case _shlwapi_PathIsURLW($reference)
+            Local $return[]
+            $return['name'] = $name
+            $return['reference'] = $reference
+            $return['url'] = $reference
+            Return $return
+        Case StringRegExp($reference, '(?i)^[0-9a-f]{7}|[0-9a-f]{40}$', 0); commit hash reference
+            Local $return[]
+            $return['name'] = $name
+            $return['reference'] = $reference
+            $return['url'] = 'https://github.com/' & $name & '/archive/' & $reference & '.zip'
+            Return $return
+        Case _SemVer_ValidRange($reference)
+            ;Legacy support for dependencies that previously was available via an online global registry
+            Switch $name
+                Case 'au3json'
+                    Local $package = fetchPackage('genius257/au3json', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'au3obj'
+                    Local $package = fetchPackage('genius257/AutoItObject-Internal', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'semver'
+                    Local $package = fetchPackage('genius257/au3-semver', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'StringRegExpSplit'
+                    Local $package = fetchPackage('genius257/StringRegExpSplit', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'au3unit'
+                    Local $package = fetchPackage('genius257/au3unit', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'au3class'
+                    Local $package = fetchPackage('genius257/au3class', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'acro.au3'
+                    Local $package = fetchPackage('seadoggie01/Acro.au3', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+                Case 'LinkedList'
+                    Local $package = fetchPackage('genius257/au3LinkedList', $reference)
+                    If @error <> 0 Then Return SetError(@error)
+                    $package['name'] = $name
+                    Return $package
+            EndSwitch
 
-    Return $reference
+            If Not StringRegExp($name, "^[a-zA-Z0-9-]+\/[a-zA-Z0-9-_.]+$", $STR_REGEXPMATCH) Then
+                ConsoleWriteError("Invalid github package name: " & $name & @CRLF)
+                Return SetError(1)
+            EndIf
+
+            $mTags = _GitHub_GetTags(StringLeft($name, StringInStr($name, "/") - 1), StringMid($name, StringInStr($name, "/") + 1))
+            For $tag In MapKeys($mTags)
+                If Not _SemVer_Valid($tag) Then MapRemove($mTags, $tag)
+            Next
+            $maxSatisfying = _semver_MaxSatisfying(MapKeys($mTags), $reference)
+            If $maxSatisfying = Null Then
+                ConsoleWrite("ERROR: No matching version found for: "&$name&"@"&$reference&@CRLF)
+            EndIf
+            Local $return[]
+            $return['name'] = $name
+            $return['reference'] = $maxSatisfying
+            $return['url'] = $mTags[$maxSatisfying].zipball_url
+            Return $return
+        Case Else
+            ConsoleWrite("invalid dependecy: "&$name&"@"&$reference&@CRLF)
+    EndSelect
+    Return SetError(1)
 EndFunc
 
 Func getPackageDependencyTree($dependencies)
@@ -96,17 +144,11 @@ Func getPackageDependencyTree($dependencies)
         For $key In MapKeys($entry)
             Local $range = $entry[$key]
             Local $package = fetchPackage($key, $range)
-            If MapExists($resolvedDependencies, $package['name']) Then
-                ConsoleWrite("Package name collision: "&$package['name']&@CRLF)
-                Return SetError(6)
+            If @error <> 0 Then
+                ConsoleWrite("Failed to fetch package: "&$key&"@"&$range&@CRLF)
+                Return SetError(7)
             EndIf
             Local $maxSatisfying = $package['reference']
-            #cs
-            Local $packageDirectory = _json_decode(BinaryToString(InetRead(StringFormat("%s%s/%s", $registry, $key, "au3pm.json"), $INET_FORCEBYPASS)))
-            Local $range = $entry.Item($key)
-            Local $versions = $packageDirectory.Item('versions').keys
-            Local $maxSatisfying = _SemVer_MaxSatisfying($versions, $range)
-            #ce
 
             If MapExists($resolvedDependencies, $key) Then
                 If $key = "AutoIt" Then $range = StringRegExpReplace($range, "(?:[0-9]+\.)?([0-9]+\.[0-9]+\.[0-9]+)", "$1")
@@ -120,7 +162,6 @@ Func getPackageDependencyTree($dependencies)
             Local $resolvedDependency[]
             $resolvedDependency['version'] = $maxSatisfying
             $resolvedDependency['url'] = $package['url']
-            ;$resolvedDependency['integrity'] = 
             $resolvedDependencies[$package['name']] = $resolvedDependency
 
             ;pretend we get package file from package with the version we matched
@@ -255,4 +296,8 @@ Func UninstallPackage($name)
     $path = @WorkingDir & '\au3pm\' & $name & '\'
     If Not FileExists($path) Then Return SetError(1)
     DirRemove($path)
+EndFunc
+
+Func ValidatePackageName($name)
+    Return StringRegExp($name, '(?(DEFINE)(?<segment>(?:[^\\\/:*?"<>|.]+|\.(?!\.))+))^(?&segment)(?:\/(?&segment))*$', $STR_REGEXPMATCH) = 1
 EndFunc
