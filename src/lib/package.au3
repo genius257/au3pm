@@ -191,15 +191,9 @@ Func getPackageDependencyTree($dependencies)
 
             ;Extracting...
 
-            If RunWait(@ScriptDir & StringFormat('\7za.exe x -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
+            If RunWait(@ScriptDir & StringFormat('\7za.exe x -bso0 -y -o"%s" "%s"', $tmp & '\out\', $tmp_file)) <> 0 Then
                 Return SetError(3)
             EndIf
-
-            #cs
-            If DirMove(_FileListToArray($tmp&'\out\', '*', 2, True)[1], @WorkingDir & '\au3pm\'&$name&'\') <> 1 Then
-                Return SetError(4)
-            EndIf
-            #ce
 
             Local $sFile = _FileListToArray($tmp&'\out\', '*', 2, True)[1]&'\au3pm.json'
             If FileExists($sFile) Then
