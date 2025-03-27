@@ -246,7 +246,7 @@ Func InstallPackage($url, $name, $bInstallDependencies = False, $sIntegrity = Nu
         ConsoleWrite(StringFormat("Error occured when generating package hash for: %s\n", $name))
         Return SetError(7)
     EndIf
-    $_sIntegrity = String($_sIntegrity)
+    $_sIntegrity = StringMid(String($_sIntegrity), 3); Remove leading "0x"
 
     If (Not ($sIntegrity = Null)) And (Not ($sIntegrity == $_sIntegrity)) Then
         ConsoleWrite(StringFormat("Package integrity check failed for: ""%s"". ""%s"" != ""%s""\n", $name, $sIntegrity, $_sIntegrity))
