@@ -32,7 +32,7 @@ EndFunc
 
 Func au3pm_json_save($json)
     If Not IsString($json) Then
-        $json = json_stringify($json)
+        $json = _json_encode_pretty($json)
     EndIf
 
     Local $hFile = FileOpen($__au3pm_json_path, 2)
