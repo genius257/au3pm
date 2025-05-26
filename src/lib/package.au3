@@ -117,6 +117,7 @@ Func fetchPackage($name, $reference)
             $maxSatisfying = _semver_MaxSatisfying(MapKeys($mTags), $reference)
             If $maxSatisfying = Null Then
                 ConsoleWrite("ERROR: No matching version found for: "&$name&"@"&$reference&@CRLF)
+                Return SetError(1)
             EndIf
             Local $return[]
             $return['name'] = $name
